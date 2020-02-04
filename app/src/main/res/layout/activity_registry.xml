@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".RegistryActivity">
 
     <ImageView
         android:id="@+id/imageView"
@@ -52,20 +52,23 @@
             android:inputType="textPassword"
             android:minWidth="300dp" />
 
-        <Button
-            android:id="@+id/login"
+        <EditText
+            android:id="@+id/password_again"
+            style="@style/MyTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:minWidth="300dp"
-            android:text="@string/form_login" />
+            android:ems="10"
+            android:hint="@string/form_password_confirm"
+            android:importantForAutofill="no"
+            android:inputType="textPassword"
+            android:minWidth="300dp" />
 
         <Button
             android:id="@+id/register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="300dp"
-            android:text="@string/form_registry" />
+            android:text="@string/form_register" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

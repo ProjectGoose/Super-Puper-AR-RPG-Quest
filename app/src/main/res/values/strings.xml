@@ -2,6 +2,8 @@
     <string name="app_name">SuperPuper_AR_RPG</string>
     <string name="form_email">e-mail</string>
     <string name="form_password">password</string>
+    <string name="form_password_confirm">confirm password</string>
     <string name="form_login">log in</string>
     <string name="form_registry">registration</string>
+    <string name="form_register">register</string>
 </resources>
