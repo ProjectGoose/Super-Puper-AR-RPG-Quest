@@ -6,4 +6,6 @@
     <string name="form_login">log in</string>
     <string name="form_registry">registration</string>
     <string name="form_register">register</string>
+    <string name="form_error_passwords">passwords don\'t match</string>
+    <string name="back">back</string>
 </resources>

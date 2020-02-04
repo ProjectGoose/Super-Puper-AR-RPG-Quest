@@ -7,7 +7,7 @@
     tools:context=".RegistryActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/img_background_form"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/email"
+            android:id="@+id/et_email"
             style="@style/MyTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             android:minWidth="300dp" />
 
         <EditText
-            android:id="@+id/password"
+            android:id="@+id/et_password"
             style="@style/MyTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
             android:minWidth="300dp" />
 
         <EditText
-            android:id="@+id/password_again"
+            android:id="@+id/et_password_again"
             style="@style/MyTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,11 +64,18 @@
             android:minWidth="300dp" />
 
         <Button
-            android:id="@+id/register"
+            android:id="@+id/btn_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="300dp"
             android:text="@string/form_register" />
+
+        <Button
+            android:id="@+id/btn_goback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="300dp"
+            android:text="@string/back" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

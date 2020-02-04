@@ -1,10 +1,19 @@
 package com.example.superpuper_ar_rpg;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 
 public class LoginActivity extends AppCompatActivity {
+
+    Button btn_login, btn_registry;
+    EditText et_email, et_password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -12,5 +21,31 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
+
+        btn_login = findViewById(R.id.btn_login);
+        btn_registry = findViewById(R.id.btn_register);
+        et_email = findViewById(R.id.et_email);
+        et_password = findViewById(R.id.et_password);
+
+        if (getIntent() != null) {
+            et_email.setText(getIntent().getStringExtra(Intent.EXTRA_EMAIL));
+        }
+
+        final Context context = this;
+        btn_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO
+            }
+        });
+
+        btn_registry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goToRegistry = new Intent(context, RegistryActivity.class);
+                goToRegistry.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(goToRegistry);
+            }
+        });
     }
 }
