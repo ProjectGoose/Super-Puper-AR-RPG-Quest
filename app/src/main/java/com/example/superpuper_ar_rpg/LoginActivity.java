@@ -36,6 +36,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO
+
+                Intent goToMap = new Intent(context, MapsActivity.class);
+                goToMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(goToMap);
             }
         });
 
