@@ -9,4 +9,7 @@
     <string name="form_error_passwords">passwords don\'t match</string>
     <string name="back">back</string>
     <string name="title_activity_maps">Map</string>
+    <string name="dialog_GPSEnableMessage">Чтобы видеть других игроков необходимо включить геолокацию</string>
+    <string name="dialog_GPSEnableAgree">Включить</string>
+    <string name="dialog_GPSEnableRefuse">Остаться offline</string>
 </resources>
