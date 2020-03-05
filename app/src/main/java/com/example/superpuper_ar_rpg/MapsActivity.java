@@ -1,6 +1,7 @@
 package com.example.superpuper_ar_rpg;
 
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
@@ -15,6 +16,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.WindowManager;
@@ -29,6 +31,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -38,6 +42,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager mLocationManager;
     private double wayLatitude =  43, wayLongitude = 169;
     private SupportMapFragment mapFragment;
+
+    ArrayList<LatLng> track = new ArrayList<>(); //Трэк
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +59,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+        outState.putAll(outState);
+        outState.putParcelableArrayList("track", track);
+    }
+
     @Override
     protected void onResume(){
         super.onResume();
@@ -71,7 +85,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         //Обновляем координаты вызывая mlocationListener через callback
-        mLocationManager.requestLocationUpdates(mLocationManager.GPS_PROVIDER, 10000, 1, mlocationListener);
+        mLocationManager.requestLocationUpdates(mLocationManager.GPS_PROVIDER, 100000, 100, mlocationListener);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        savedInstanceState.getBundle("");
+        track = savedInstanceState.getParcelableArrayList("track");
+        for (LatLng pos: track) {
+            mMap.addMarker(new MarkerOptions().position(pos).title("You were here"));
+        }
     }
 
     //создаем окно с просьбой включить gps
@@ -106,6 +131,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //при обновлении локации обновляем карту
             Toast.makeText(MapsActivity.this, "LocationChanged", Toast.LENGTH_SHORT).show();
             mapFragment.getMapAsync(MapsActivity.this);
+            LatLng myCoordinates = new LatLng(location.getLatitude(),location.getLongitude());
+            track.add(myCoordinates);
+            mMap.addMarker(new MarkerOptions().position(myCoordinates).title("Marker in ... what is it?"));
             Log.d("LocationChanged", "Longtitude " + location.getLongitude() + " Latitude " + location.getLatitude());
         }
 
@@ -143,13 +171,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
-                    LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
-                    Log.d("TAG2", "Latitude " + wayLatitude + " Longtitude " + wayLongitude);
-
-//                  mMap.clear();
-                    mMap.addMarker(new MarkerOptions().position(myCoordinates).title("Marker in ... what is it?"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
-                    Toast.makeText(MapsActivity.this, "Ha ha, found you, Lenny", Toast.LENGTH_SHORT).show();
+//                    LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+//                    Log.d("TAG2", "Latitude " + wayLatitude + " Longtitude " + wayLongitude);
+//                    track.add(new LatLng())
+//
+//                    mMap.clear();
+//                    mMap.addMarker(new MarkerOptions().position(myCoordinates).title("Marker in ... what is it?"));
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
+//                    Toast.makeText(MapsActivity.this, "Ha ha, found you, Lenny", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Toast.makeText(MapsActivity.this, "Location == null", Toast.LENGTH_SHORT).show();
