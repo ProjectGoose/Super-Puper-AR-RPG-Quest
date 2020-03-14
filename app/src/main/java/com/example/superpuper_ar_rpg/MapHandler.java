@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
@@ -27,53 +28,35 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import static android.content.Context.LOCATION_SERVICE;
 
 public class MapHandler implements OnMapReadyCallback {
 
     private Context context;
-    private GoogleMap mMap;
-    private boolean mapReady = false; //На случай, если карта не готова, чтобы не словить NullPointer
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationManager mLocationManager;
     private SupportMapFragment mapFragment;
 
-    private MovingUserCoordinates mu = new MovingUserCoordinates(this);
+    private MovingUserCoordinates mu;
 
     //debug
     public static boolean isMocking = false;
-    private LatLng testLL = new LatLng(10,10);
+    private LatLng testLL = new LatLng(55.75,37.61);
 
     //Объекты для отрисовки карты
     LatLng userLatLng;
-    CircleOptions userCircleOptions = new CircleOptions()
+    private final float RADIUS = 15f;
+    private CircleOptions userCircleOptions = new CircleOptions()
             .center(testLL)
             .fillColor(Color.RED)
-            .radius(1200);
-    Circle userCircle;
-    boolean firstStart = true;
-
-    public void start(){
-        if(isMocking)
-            userLatLng = new LatLng(testLL.latitude, testLL.longitude);
-        else {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-            try {
-                if(mLocationManager.getLastKnownLocation("GPS") != null) {
-                    userLatLng = new LatLng(mLocationManager.getLastKnownLocation("GPS").getLatitude(),
-                            mLocationManager.getLastKnownLocation("GPS").getLatitude());
-                }
-            } catch(SecurityException e){
-                Log.d("TAG10", "SecurityException " + e.getMessage());
-            }
-        }
-        mu.execute();
-    }
-
-    public void stop(){
-        mu.stop();
-    }
+            .radius(RADIUS)
+            .strokeWidth(0.1f);
+    private Circle userCircle;
+    private boolean firstStart = true;
+    private boolean centering = false;
+    private boolean locating = false;
 
     MapHandler(SupportMapFragment mapFragment, LocationManager locationManager, Context context){
         this.mapFragment = mapFragment;
@@ -83,6 +66,48 @@ public class MapHandler implements OnMapReadyCallback {
                 == PackageManager.PERMISSION_GRANTED) {
             userLatLng = new LatLng(testLL.latitude, testLL.longitude);
         }
+        mu = new MovingUserCoordinates(this);
+    }
+
+    public void start(){
+        if(locating) {
+            if (isMocking)
+                userLatLng = new LatLng(testLL.latitude, testLL.longitude);
+            else {
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+                try {
+                    if (mLocationManager.getLastKnownLocation("GPS") != null) {
+                        userLatLng = new LatLng(mLocationManager.getLastKnownLocation("GPS").getLatitude(),
+                                mLocationManager.getLastKnownLocation("GPS").getLatitude());
+                    }
+                } catch (SecurityException e) {
+                    Log.d("TAG10", "SecurityException " + e.getMessage());
+                }
+            }
+        }
+        if (!mu.isPlaying && locating)
+            mu.execute();
+    }
+
+    public void stop(){
+        mu.stop();
+    }
+
+    public void setLocating(boolean locating){
+        this.locating = locating;
+        start();
+        mapFragment.getMapAsync(this);
+    }
+    public boolean isLocating() {
+        return locating;
+    }
+
+    public void setCentering(boolean centering){
+        this.centering = centering;
+        mapFragment.getMapAsync(this);
+    }
+    public boolean isCentering(){
+        return centering;
     }
 
     @Override
@@ -92,52 +117,64 @@ public class MapHandler implements OnMapReadyCallback {
             firstStart = false;
         }
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(userLatLng)
-                .zoom(10)
-                .build();
+        if(centering) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(userLatLng)
+                    .zoom(googleMap.getCameraPosition().zoom)
+                    .build();
 
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        userCircle.setCenter(userLatLng);
-        Log.d("MAP", "MapReady");
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+        if(locating) {
+            userCircle.setCenter(userLatLng);
+            if(!userCircle.isVisible()){
+                userCircle.setVisible(true);
+            }
+        }
+        else{
+            if(userCircle.isVisible()){
+                userCircle.setVisible(false);
+            }
+        }
+        Log.d("MAP", "Zoom: " + Float.toString(googleMap.getCameraPosition().zoom));
     }
-
 
     private class MovingUserCoordinates extends AsyncTask<Void, LatLng, Void> {
         private volatile boolean isPlaying = false;
 
         private OnMapReadyCallback callback;
 
+        LocationListener mlocationListener;
+
         MovingUserCoordinates(OnMapReadyCallback callback) {
             this.callback = callback;
+            mlocationListener = new LocationListener() {
+                //реализуем интерфейс LocationListener
+                //Обновлять карту имеет смысл только при обновлении координат, при этом это невозможно сделать в методе doInBackground,
+                //значит это надо делать в onProgressUpdate, значит метод publishProgress должен вызываться в onLocationChanged,
+                //поэтому реализовать интерфейс LocationListener нужно внутри MovingUserCoordinates
+                @Override
+                public void onLocationChanged(Location location) {
+                    Log.d("TAG1", location.getLatitude() + " " + location.getLongitude());
+                    publishProgress(new LatLng(location.getLatitude(), location.getLongitude()));
+                }
+
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String s) {
+                    Log.d("GPS", "Provider is enabled");
+                }
+
+                @Override
+                public void onProviderDisabled(String s) {
+
+                }
+            };
         }
-
-        //реализуем интерфейс LocationListener
-        //Обновлять карту имеет смысл только при обновлении координат, при этом это невозможно сделать в методе doInBackground,
-        //значит это надо делать в onProgressUpdate, значит метод publishProgress должен вызываться в onLocationChanged,
-        //поэтому реализовать интерфейс LocationListener нужно внутри MovingUserCoordinates
-        LocationListener mlocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.d("TAG1", location.getLatitude() + " " + location.getLongitude());
-                publishProgress(new LatLng(location.getLatitude(), location.getLongitude()));
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-                Log.d("GPS", "Provider is enabled");
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
 
         @Override
         protected void onPreExecute() {
@@ -149,11 +186,11 @@ public class MapHandler implements OnMapReadyCallback {
                 ActivityCompat.requestPermissions(mapFragment.getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 42);
             }
 
+            isPlaying = true;
         }
 
         @Override
         protected Void doInBackground(Void... values) {
-            isPlaying = true;
             while (isPlaying) {
                 if (isMocking) {
                     try {
@@ -162,7 +199,7 @@ public class MapHandler implements OnMapReadyCallback {
                         e.printStackTrace();
                     }
                     Log.d("TAG3", "Mocking AsyncTask started");
-                    publishProgress(new LatLng(userLatLng.latitude, userLatLng.longitude + 0.01f));
+                    publishProgress(new LatLng(userLatLng.latitude, userLatLng.longitude + 0.0001f));
                 } else if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED){
                     //Создаем свой Looper, который нужен, чтобы...
@@ -170,7 +207,8 @@ public class MapHandler implements OnMapReadyCallback {
                     lpr.prepare();
                     Log.d("TAG2", "GPS AsyncTask started");
                     try {
-                        mLocationManager.requestLocationUpdates(mLocationManager.GPS_PROVIDER,
+                        if(locating)
+                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                                 1000, 1, mlocationListener);
                     } catch (SecurityException e) {
                         Log.d("TAG2.2", "SecurityException" + e.getMessage());
@@ -195,14 +233,12 @@ public class MapHandler implements OnMapReadyCallback {
             super.onProgressUpdate(values);
             userLatLng = values[0];
             Log.d("TAG6", userLatLng.latitude + " " + userLatLng.longitude);
-            Toast.makeText(context, userLatLng.latitude + " " + userLatLng.longitude, Toast.LENGTH_SHORT );
             mapFragment.getMapAsync(callback);
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            isPlaying = false;
             Log.d("MAP", "not Playing");
         }
     }

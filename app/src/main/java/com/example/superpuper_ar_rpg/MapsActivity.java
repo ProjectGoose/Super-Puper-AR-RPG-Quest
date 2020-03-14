@@ -15,9 +15,10 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.SupportMapFragment;
 
 
@@ -25,6 +26,8 @@ public class MapsActivity extends FragmentActivity{
 
     private SupportMapFragment mapFragment;
     private LocationManager mLocationManager;
+    private ImageButton btnFindLocation;
+    private ImageButton btnCentering;
 
     MapHandler mapHandler;
 
@@ -44,20 +47,29 @@ public class MapsActivity extends FragmentActivity{
         // Получаем SupportMapFragment и получаем callback когда карта будет готова к работе
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
-        mapHandler = new MapHandler(mapFragment, mLocationManager, this);
+        btnFindLocation = findViewById(R.id.btn_find_location);
+        btnFindLocation.setBackground(getDrawable(R.drawable.target_off));
+        btnCentering = findViewById(R.id.btn_centering);
+        btnCentering.setVisibility(View.INVISIBLE);
+        btnCentering.setBackground(getDrawable(R.drawable.centering_off));
+        btnCentering.setClickable(false);
+
         Log.d("ActivityState", "onCreate");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        mapHandler = new MapHandler(mapFragment, mLocationManager, this);
+        mapHandler.start();
+        //проверям, разрешено ли использовать gps (надо дописать)
         Log.d("ActivityState", "onStart");
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        //проверям, разрешено ли использовать gps (надо дописать)
+
         if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             //TODO Permission is not granted
@@ -67,8 +79,7 @@ public class MapsActivity extends FragmentActivity{
             GPSEnableDialog gpsEnable = new GPSEnableDialog();
             gpsEnable.show(getSupportFragmentManager(), "what`s the tag?");
         }
-            //Если всё включено, то запускаем хэндлер
-            mapHandler.start();
+        //Если всё включено, то запускаем хэндлер
 
         Log.d("ActivityState", "onResume");
     }
@@ -82,8 +93,8 @@ public class MapsActivity extends FragmentActivity{
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("ActivityState", "onStop");
         mapHandler.stop();
+        Log.d("ActivityState", "onStop");
     }
 
     @Override
@@ -115,5 +126,37 @@ public class MapsActivity extends FragmentActivity{
             });
             return builder.create();
         }
+    }
+
+    public void onMapInteractionButtonPressed(View view){
+        Log.d("Button", "Ouu, my");
+        switch (view.getId()){
+            case R.id.btn_find_location:
+                if(mapHandler.isLocating()){
+                    btnFindLocation.setBackground(getDrawable(R.drawable.target_off));
+                    mapHandler.setLocating(false);
+                    btnCentering.setVisibility(View.INVISIBLE);
+                    btnCentering.setClickable(false);
+                }
+                else{
+                    btnFindLocation.setBackground(getDrawable(R.drawable.target_on));
+                    mapHandler.setLocating(true);
+                    mapHandler.setCentering(false);
+                    btnCentering.setVisibility(View.VISIBLE);
+                    btnCentering.setClickable(true);
+                }
+                break;
+            case R.id.btn_centering:
+                if(mapHandler.isCentering()){
+                    mapHandler.setCentering(false);
+                    btnCentering.setBackground(getDrawable(R.drawable.centering_off));
+                }
+                else {
+                    mapHandler.setCentering(true);
+                    btnCentering.setBackground(getDrawable(R.drawable.centering_on));
+                }
+                break;
+        }
+
     }
 }
