@@ -1,20 +1,15 @@
 package com.example.superpuper_ar_rpg;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 
 public class LoginActivity extends AppCompatActivity {
@@ -74,10 +69,5 @@ public class LoginActivity extends AppCompatActivity {
                     MapHandler.isMocking = false;
             }
         });
-
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}, 42);
-        }
     }
 }
