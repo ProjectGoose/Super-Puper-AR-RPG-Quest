@@ -63,10 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         sw_mocker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                    MapHandler.isMocking = true;
-                else
-                    MapHandler.isMocking = false;
+                 MapHandler.isMocking = isChecked;
             }
         });
     }
