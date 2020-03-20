@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         et_email = findViewById(R.id.et_email);
         et_password = findViewById(R.id.et_password);
 
-        sw_mocker = findViewById(R.id.switch_mocker); //debug
+        sw_mocker = findViewById(R.id.switch2); //debug
 
 
         if (getIntent() != null) {

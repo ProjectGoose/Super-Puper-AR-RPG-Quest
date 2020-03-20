@@ -19,10 +19,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 
 
-public class MapsActivity extends FragmentActivity{
+public class MapsActivity extends FragmentActivity {
 
     private SupportMapFragment mapFragment;
     private LocationManager mLocationManager;

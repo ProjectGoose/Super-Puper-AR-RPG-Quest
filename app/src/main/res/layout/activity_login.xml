@@ -66,6 +66,12 @@
             android:layout_height="wrap_content"
             android:minWidth="300dp"
             android:text="@string/form_registry" />
+
+        <Switch
+            android:id="@+id/switch2"
+            android:layout_width="301dp"
+            android:layout_height="wrap_content"
+            android:text="Mocking mode" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
