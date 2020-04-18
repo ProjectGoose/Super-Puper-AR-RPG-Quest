@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
+
+import static android.icu.text.DisplayContext.LENGTH_SHORT;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
 
         sw_mocker = findViewById(R.id.switch2); //debug
 
+        NetworkService.getInstance(); //инициализируем networkservice
 
         if (getIntent() != null) {
             et_email.setText(getIntent().getStringExtra(Intent.EXTRA_EMAIL));
@@ -46,7 +50,13 @@ public class LoginActivity extends AppCompatActivity {
 
                 Intent goToMap = new Intent(context, MapsActivity.class);
                 goToMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(goToMap);
+                LoginBody loginBody = new LoginBody(et_email.getText().toString(), et_password.getText().toString());
+                if(true /*NetworkService.getInstance().requestLogin(loginBody)*/) {
+                    User.firstSetInstance("1324", "asdf", 2); //TEST
+                    startActivity(goToMap);
+                } else {
+                    Toast.makeText(context, R.string.login_fail, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -67,4 +77,5 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 }

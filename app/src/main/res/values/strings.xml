@@ -12,4 +12,8 @@
     <string name="dialog_GPSEnableMessage">Чтобы видеть других игроков необходимо включить геолокацию</string>
     <string name="dialog_GPSEnableAgree">Включить</string>
     <string name="dialog_GPSEnableRefuse">Остаться offline</string>
+    <string name="login_fail">Неверный логин или пароль</string>
+    <string name="title_settings">Настройки</string>
+    <string name="title_profile">Профиль</string>
+    <string name="title_map">Карта</string>
 </resources>

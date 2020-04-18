@@ -1,8 +1,18 @@
 package com.example.superpuper_ar_rpg;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.NavHostController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -20,17 +30,22 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 public class MapsActivity extends FragmentActivity {
 
     private SupportMapFragment mapFragment;
-    private LocationManager mLocationManager;
+    public static LocationManager mLocationManager;
     private ImageButton btnFindLocation;
     private ImageButton btnCentering;
+    private MapView mapView;
 
-    MapHandler mapHandler;
+    public MapHandler mapHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +53,20 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
 
         //Портретная ориентация, чтобы не было лишней головной боли пока
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //А вот тут убираем стандартную верхнюю панель
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        //Блок, отвечающий за панель навигации
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        NavigationUI.setupWithNavController(bottomNav, navController);
 
         //привязываем locationManager к сервису контроля за gps???
         mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         // Получаем SupportMapFragment и получаем callback когда карта будет готова к работе
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        //
+        /*
 
         btnFindLocation = findViewById(R.id.btn_find_location);
         btnFindLocation.setBackground(getDrawable(R.drawable.target_off));
@@ -54,15 +74,24 @@ public class MapsActivity extends FragmentActivity {
         btnCentering.setVisibility(View.INVISIBLE);
         btnCentering.setBackground(getDrawable(R.drawable.centering_off));
         btnCentering.setClickable(false);
+*/
 
         Log.d("ActivityState", "onCreate");
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
-        mapHandler = new MapHandler(mapFragment, mLocationManager, this);
-        mapHandler.start();
+        mapView = findViewById(R.id.map);
+        if(mapView != null){
+            mapView.onCreate(null);
+            mapView.onResume();
+            mapHandler = new MapHandler(mapView, mLocationManager, this);
+            mapHandler.start();
+        } else {
+            Log.d("TAG", "mapView = null");
+        }
         //проверям, разрешено ли использовать gps (надо дописать)
         Log.d("ActivityState", "onStart");
     }
@@ -113,7 +142,7 @@ public class MapsActivity extends FragmentActivity {
             builder.setPositiveButton(R.string.dialog_GPSEnableAgree, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    //пиздуй в настройки включать геолокацию
+                    //отправляем в настройки включать геолокацию
                     Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     startActivity(intent);
                 }
@@ -121,7 +150,7 @@ public class MapsActivity extends FragmentActivity {
             builder.setNegativeButton(R.string.dialog_GPSEnableRefuse, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    //ну как хочешь
+                    //не включаем
                     dialogInterface.cancel();
                 }
             });
@@ -129,7 +158,7 @@ public class MapsActivity extends FragmentActivity {
         }
     }
 
-    public void onMapInteractionButtonPressed(View view){
+    /*public void onMapInteractionButtonPressed(View view){
         Log.d("Button", "Ouu, my");
         switch (view.getId()){
             case R.id.btn_find_location:
@@ -159,5 +188,5 @@ public class MapsActivity extends FragmentActivity {
                 break;
         }
 
-    }
+    }*/
 }

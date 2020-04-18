@@ -8,6 +8,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -27,28 +30,25 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
-
-import static android.content.Context.LOCATION_SERVICE;
 
 public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
     private Context context;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationManager mLocationManager;
-    private SupportMapFragment mapFragment;
     private GoogleMap map; //Добавляем нормальный объект карты, а не все эти извращения
-    private ArrayList<Quest> parsedQuests = new ArrayList<>();//Хранит квесты, запарсенные из json(предположительно) файла, полученного от сервера
-    private ArrayList<Quest> appendedQuests = new ArrayList<>(); //Хранит установленные на карте в данный момент квесты
-
+    private ArrayList<MapQuest> parsedQuests = new ArrayList<>();//Хранит квесты, запарсенные из json(предположительно) файла, полученного от сервера
+    private ClusterManager<MarkerItem> clusterManager; //кластеризатор
+    private MapView mapView;
 
     //debug
     public static boolean isMocking = false;
     private LatLng testLL = new LatLng(55.75, 37.61);
 
     //Объекты для отрисовки карты
-    LatLng userLatLng;
     private final float RADIUS = 15f;
     private CircleOptions userCircleOptions = new CircleOptions()
             .center(testLL)
@@ -60,30 +60,30 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
     private boolean centering = false;
     private boolean locating = false;
 
-    MapHandler(SupportMapFragment mapFragment, LocationManager locationManager, Context context) {
-        this.mapFragment = mapFragment;
+    public MapHandler(MapView mapView, LocationManager locationManager, Context context) {
+        this.mapView = mapView;
         this.mLocationManager = locationManager;
         this.context = context;
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            userLatLng = new LatLng(testLL.latitude, testLL.longitude);
+            User.getInstance().setCoordinates(new LatLng(testLL.latitude, testLL.longitude));
         }
     }
 
     public void start() {
-        mapFragment.getMapAsync(this);
+        mapView.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         try {
             if (mLocationManager.getLastKnownLocation("GPS") != null) {
-                userLatLng = new LatLng(mLocationManager.getLastKnownLocation("GPS").getLatitude(),
-                        mLocationManager.getLastKnownLocation("GPS").getLatitude());
+                User.getInstance().setCoordinates(new LatLng(mLocationManager.getLastKnownLocation("GPS").getLatitude(),
+                        mLocationManager.getLastKnownLocation("GPS").getLatitude()));
                 setUserMarker();
             }
         } catch (SecurityException e) {
             Log.d("TAG10", "SecurityException " + e.getMessage());
         }
         startLocationUpdates();
-        getQuests(); //Временный метод - затычка, заполняет parsedQuests
+        getQuests();
     }
 
 
@@ -94,7 +94,6 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
     public void setLocating(boolean locating) {
         this.locating = locating;
         start();
-        //mapFragment.getMapAsync(this);
     }
 
     public boolean isLocating() {
@@ -103,7 +102,7 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
 
     public void setCentering(boolean centering) {
         this.centering = centering;
-        mapFragment.getMapAsync(this);
+        mapView.getMapAsync(this);
     }
 
     public boolean isCentering() {
@@ -113,83 +112,74 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        map.setOnCameraIdleListener(this); //листенер на передвижение карты
+        map.setOnCameraIdleListener(this);
         Log.d("MAP", "Zoom: " + Float.toString(googleMap.getCameraPosition().zoom));
+        clusterManager = new ClusterManager<MarkerItem>(context, map);
+        //map.setOnCameraIdleListener(clusterManager);
+        map.setOnMarkerClickListener(clusterManager);
+        /*for(int i =0; i < parsedQuests.size(); i++) {
+            MarkerItem markerItem = new MarkerItem(parsedQuests.get(i).coordinates.latitude,parsedQuests.get(i).coordinates.longitude);
+            clusterManager.addItem(markerItem);
+        }*/
     }
 
     //колбэк листенера
+    /*@Override
+    public void onCameraIdle(){
+        *//*VisibleRegion visreg = map.getProjection().getVisibleRegion(); //получает координаты углов области карты, отображаемой на экране в данный момент
+        MarkerAppender mApp = new MarkerAppender(visreg, parsedQuests);
+        if(!mApp.isAlive()) {
+            //mApp.start();
+            Log.d("TAG", "Thread started");
+        }*//*
+    }*/
+
+    private boolean flag = true;
     @Override
     public void onCameraIdle(){
-        VisibleRegion visreg = map.getProjection().getVisibleRegion(); //получает координаты углов области карты, отображаемой на экране в данный момент
-        MarkerAppender mApp = new MarkerAppender(visreg);
-        if(!mApp.isAlive()) {
-            mApp.run();
+        Log.d("TAG", "onCameraIdle");
+        VisibleRegion visReg = map.getProjection().getVisibleRegion();
+        ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
+        //parsedQuests1 = NetworkService.getInstance().requestQuests(new QuestsBody(User.getInstance().getCoordinates(), visReg, "12345678"));
+        if(flag) {
+            parsedQuests1 = parsedQuests; //затычка
+            flag = false;
+        } else {
+            parsedQuests1.clear();
+            flag = true;
+            Log.d("TAG", "flag = " + flag);
         }
+        ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
+        clusterManager.clearItems();
+        for(MapQuest buf: parsedQuests1){
+            Log.d("TAG", "buf " + buf.coordinates);
+            clusterManager.addItem(new MarkerItem(buf.coordinates.latitude, buf.coordinates.longitude));
+        }
+        clusterManager.cluster();
     }
 
-    //Поток, в котором будут расставляться маркеры квестов
-    class MarkerAppender extends Thread {
-        VisibleRegion visreg; //хранит
-        MarkerAppender(VisibleRegion visreg){
-            this.visreg = visreg;
-        }
-        @Override
-        public void run(){
-            //ставим маркеры квестов
-            for(Quest buf: parsedQuests){
-                if(visreg.latLngBounds.contains(buf.coordinates)) {
-                    boolean flag = true;
-                    for(Quest buf1: appendedQuests){
-                        if(buf == buf1){
-                            flag = false;
-                        }
-                    }
-                    if(flag) {
-                        buf.marker = map.addMarker(new MarkerOptions().position(buf.coordinates).title(buf.title));
-                        appendedQuests.add(buf);
-                        Log.d("TAG3.1", appendedQuests.get(appendedQuests.size() - 1) + " has been added to the map");
-                    }
-                }
-            }
-            //Удаляем маркеры, которые вышли за поле видимости
-            Log.d("TAG1234", "Size of appendedQuests = " + appendedQuests.size());
-            int size = appendedQuests.size();
-            //Хз как сделать через for each, так как получаются траблы с удалением объектов массива
-            for(int i = 0; i < size; i++){
-                Log.d("TAG123466" , "i = " + i + " size = " +size);
-                //если маркер, который находится на карте не в поле видимости, то удаляем его с карты и из массива маркеров, установленных на карте
-                if(!visreg.latLngBounds.contains(appendedQuests.get(i).marker.getPosition())){
-                    appendedQuests.get(i).marker.remove();
-                    Log.d("TAG", appendedQuests.get(i).title + " has been removed");
-                    appendedQuests.remove(i);
-                    i--;
-                    size = appendedQuests.size();
-                    Log.d("TAG3.2", "size = " + size);
-                }
-            }
-            Log.d("TAG", "=================================================================");
-        }
-    }
 
     //скорее всего будет как то в процессе парсить маркеры в определенной области из json файла с маркерами
     public void getQuests(){
+        Log.d("TAG", "getQuests");
         GetQuestsThread gqt = new GetQuestsThread();
-        gqt.run();
+        gqt.start();
     }
 
     //будет парсить маркеры
     class GetQuestsThread extends Thread{
         @Override
         public void run(){
-            parsedQuests.add(new Quest("Проникнуть в рот мирэа", "По неизвестным причинам с 16 марта объяевлен карантин. " +
+            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа", "По неизвестным причинам с 16 марта объяевлен карантин. " +
                     "Возможный лут: резиновые члены, кожаные костюмы, Карпов. " +
                     "Рекомендуется взять автомат, патроны, противогаз", new LatLng(55.669696, 37.481083)));
-            parsedQuests.add(new Quest("Взорвать дом разраба", "text", new LatLng(55.671313, 37.285355)));
-            parsedQuests.add(new Quest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811)));
-            parsedQuests.add(new Quest("СОШ №1", "text", new LatLng(55.668836, 37.286733)));
-            parsedQuests.add(new Quest("квест", "text", new LatLng(55.664982, 37.283637)));
+            parsedQuests.add(new MapQuest("Взорвать дом разраба", "text", new LatLng(55.671313, 37.285355)));
+            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811)));
+            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733)));
+            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637)));
         }
     }
+
 
 
     private void startLocationUpdates(){
@@ -214,14 +204,14 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
 
         if (centering) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(userLatLng)
+                    .target(User.getInstance().getCoordinates())
                     .zoom(map.getCameraPosition().zoom)
                     .build();
 
             map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
         if (locating) {
-            userCircle.setCenter(userLatLng);
+            userCircle.setCenter(User.getInstance().getCoordinates());
             if (!userCircle.isVisible()) {
                 userCircle.setVisible(true);
             }
@@ -237,8 +227,8 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
     LocationListener mlocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            Toast.makeText(context, "Location updated " + userLatLng.latitude + " " + userLatLng.longitude, Toast.LENGTH_SHORT).show();
+            User.getInstance().setCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
+            Toast.makeText(context, "Location updated " + User.getInstance().getCoordinates().latitude + " " + User.getInstance().getCoordinates().longitude, Toast.LENGTH_SHORT).show();
             setUserMarker();
         }
 
