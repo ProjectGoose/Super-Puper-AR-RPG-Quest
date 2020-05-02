@@ -1,4 +1,4 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.Network;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.VisibleRegion;

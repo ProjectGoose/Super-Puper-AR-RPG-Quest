@@ -1,6 +1,7 @@
 package com.example.superpuper_ar_rpg;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -15,12 +16,15 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -28,89 +32,126 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import static android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.INTERNET;
 
-public class MapsActivity extends FragmentActivity {
 
-    private SupportMapFragment mapFragment;
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener/*, *//*GoogleMap.OnCameraIdleListener*/ {
+
     public static LocationManager mLocationManager;
     private ImageButton btnFindLocation;
     private ImageButton btnCentering;
     private MapView mapView;
+    private FusedLocationProviderClient fusedLocationClient;
+    private int requestCode;
+    private final String permissions[]= {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION, INTERNET};
 
     public MapHandler mapHandler;
+    private GoogleMap gmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        mLocationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         //Портретная ориентация, чтобы не было лишней головной боли пока
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //А вот тут убираем стандартную верхнюю панель
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //Блок, отвечающий за панель навигации
+        //Блок, отвечающий за панель навигации: устанавливаем контроллер на панель
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         NavigationUI.setupWithNavController(bottomNav, navController);
 
-        //привязываем locationManager к сервису контроля за gps???
-        mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-        // Получаем SupportMapFragment и получаем callback когда карта будет готова к работе
-        //
         /*
-
         btnFindLocation = findViewById(R.id.btn_find_location);
         btnFindLocation.setBackground(getDrawable(R.drawable.target_off));
         btnCentering = findViewById(R.id.btn_centering);
         btnCentering.setVisibility(View.INVISIBLE);
         btnCentering.setBackground(getDrawable(R.drawable.centering_off));
         btnCentering.setClickable(false);
-*/
+        */
 
+        if(!checkPermission(this, permissions)){
+            ActivityCompat.requestPermissions(this, permissions, requestCode);
+        }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Log.d("ActivityState", "onCreate");
     }
-
 
     @Override
     protected void onStart() {
         super.onStart();
         mapView = findViewById(R.id.map);
-        if(mapView != null){
+        mapView.getMapAsync(this);
+        /*if(mapView != null){
             mapView.onCreate(null);
             mapView.onResume();
-            mapHandler = new MapHandler(mapView, mLocationManager, this);
+            mapHandler = new MapHandler(mapView, this, fusedLocationClient);
             mapHandler.start();
+            Log.d("TAG", "MapHandler started");
         } else {
             Log.d("TAG", "mapView = null");
-        }
-        //проверям, разрешено ли использовать gps (надо дописать)
+        }*/
         Log.d("ActivityState", "onStart");
     }
 
     @Override
+    public void onMapReady(GoogleMap googleMap) {
+        gmap = googleMap;
+        mapHandler = new MapHandler(gmap, this, fusedLocationClient);
+        //mapHandler.start();
+        //gmap.setOnCameraIdleListener(this);
+        //gmap.setOnMarkerClickListener(this);
+        gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(0,0))
+                .title("Sydney"));
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.d("TAG-", "mapsCLICKED");
+        return false;
+    }
+
+    //TEST!!!
+    /*@Override
+    public void onCameraIdle(){
+        Log.d("TAG", "IDLE");
+    }*/
+
+
+    @Override
     protected void onResume(){
         super.onResume();
-
-        if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            //TODO Permission is not granted
-        }
         //Проверяем, включен ли gps
         if (!mLocationManager.isProviderEnabled("gps")) {
             GPSEnableDialog gpsEnable = new GPSEnableDialog();
             gpsEnable.show(getSupportFragmentManager(), "what`s the tag?");
         }
-        //Если всё включено, то запускаем хэндлер
-
         Log.d("ActivityState", "onResume");
     }
 
@@ -123,7 +164,7 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        mapHandler.stop();
+        //mapHandler.stop();
         Log.d("ActivityState", "onStop");
     }
 
@@ -131,6 +172,18 @@ public class MapsActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("ActivityState", "onDestroy");
+    }
+
+
+    private boolean checkPermission(Context context, String[] permissions){
+        Boolean flag = true;
+        for(String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                Log.d("TAG-MapsActivityInf", "Permission " + permission + " is not granted");
+                flag = false;
+            }
+        }
+        return(flag);
     }
 
     //создаем окно с просьбой включить gps

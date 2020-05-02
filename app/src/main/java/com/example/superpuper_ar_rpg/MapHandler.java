@@ -1,6 +1,7 @@
 package com.example.superpuper_ar_rpg;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -8,21 +9,31 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
+import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
+import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.example.superpuper_ar_rpg.Network.NetworkService;
+import com.example.superpuper_ar_rpg.UI.QuestInfoFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -30,19 +41,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 
-public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
+public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener {
 
     private Context context;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private LocationManager mLocationManager;
+    private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap map; //Добавляем нормальный объект карты, а не все эти извращения
     private ArrayList<MapQuest> parsedQuests = new ArrayList<>();//Хранит квесты, запарсенные из json(предположительно) файла, полученного от сервера
     private ClusterManager<MarkerItem> clusterManager; //кластеризатор
-    private MapView mapView;
+    //private MapView mapView;
+    private int locationUpdateCounter = 0;
+    private LocationCallback locationCallback;
 
     //debug
     public static boolean isMocking = false;
@@ -60,28 +75,38 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
     private boolean centering = false;
     private boolean locating = false;
 
-    public MapHandler(MapView mapView, LocationManager locationManager, Context context) {
-        this.mapView = mapView;
-        this.mLocationManager = locationManager;
+    public MapHandler(GoogleMap map, Context context, FusedLocationProviderClient fusedLocationClient) {
+        map.setOnCameraIdleListener(this);
+        //clusterManager = new ClusterManager<>(context, map);
+        map.setOnMarkerClickListener(this);
+        /*clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MarkerItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<MarkerItem> cluster) {
+                Log.d("TAG-", "Cluster clicked");
+                return false;
+            }
+        });*/
+        //map.setOnCameraIdleListener(clusterManager);
+        /*for(int i =0; i < parsedQuests.size(); i++) {
+        MarkerItem markerItem = new MarkerItem(parsedQuests.get(i).coordinates.latitude,parsedQuests.get(i).coordinates.longitude);
+        clusterManager.addItem(markerItem);
+    }*/
+        /*map.addMarker(new MarkerOptions()
+                .position(new LatLng(10,10))
+                .title("Sydney2"));*/
+        this.map = map;
         this.context = context;
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            User.getInstance().setCoordinates(new LatLng(testLL.latitude, testLL.longitude));
-        }
+        this.fusedLocationClient = fusedLocationClient;
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.d("TAG-", "mapsCLICKED");
+        return false;
     }
 
     public void start() {
-        mapView.getMapAsync(this);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-        try {
-            if (mLocationManager.getLastKnownLocation("GPS") != null) {
-                User.getInstance().setCoordinates(new LatLng(mLocationManager.getLastKnownLocation("GPS").getLatitude(),
-                        mLocationManager.getLastKnownLocation("GPS").getLatitude()));
-                setUserMarker();
-            }
-        } catch (SecurityException e) {
-            Log.d("TAG10", "SecurityException " + e.getMessage());
-        }
         startLocationUpdates();
         getQuests();
     }
@@ -102,14 +127,13 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
 
     public void setCentering(boolean centering) {
         this.centering = centering;
-        mapView.getMapAsync(this);
     }
 
     public boolean isCentering() {
         return centering;
     }
 
-    @Override
+    /*@Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setOnCameraIdleListener(this);
@@ -117,11 +141,16 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
         clusterManager = new ClusterManager<MarkerItem>(context, map);
         //map.setOnCameraIdleListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
-        /*for(int i =0; i < parsedQuests.size(); i++) {
+        *//*for(int i =0; i < parsedQuests.size(); i++) {
             MarkerItem markerItem = new MarkerItem(parsedQuests.get(i).coordinates.latitude,parsedQuests.get(i).coordinates.longitude);
             clusterManager.addItem(markerItem);
-        }*/
-    }
+        }*//*
+
+        map.setOnMarkerClickListener(this);
+    }*/
+
+
+
 
     //колбэк листенера
     /*@Override
@@ -134,32 +163,31 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
         }*//*
     }*/
 
-    private boolean flag = true;
+    private boolean flag = true; //временно
     @Override
     public void onCameraIdle(){
-        Log.d("TAG", "onCameraIdle");
+        /*Log.d("TAG", "onCameraIdle");
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
         ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
         //parsedQuests1 = NetworkService.getInstance().requestQuests(new QuestsBody(User.getInstance().getCoordinates(), visReg, "12345678"));
-        if(flag) {
+        *//*if(flag) {
             parsedQuests1 = parsedQuests; //затычка
             flag = false;
         } else {
             parsedQuests1.clear();
             flag = true;
             Log.d("TAG", "flag = " + flag);
-        }
+        }*//*
+        parsedQuests1 = parsedQuests; //временно
         ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
         clusterManager.clearItems();
         for(MapQuest buf: parsedQuests1){
             Log.d("TAG", "buf " + buf.coordinates);
             clusterManager.addItem(new MarkerItem(buf.coordinates.latitude, buf.coordinates.longitude));
         }
-        clusterManager.cluster();
+        clusterManager.cluster();*/
     }
 
-
-    //скорее всего будет как то в процессе парсить маркеры в определенной области из json файла с маркерами
     public void getQuests(){
         Log.d("TAG", "getQuests");
         GetQuestsThread gqt = new GetQuestsThread();
@@ -181,18 +209,64 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
     }
 
 
-
     private void startLocationUpdates(){
-            try {
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, mlocationListener);
-            } catch (SecurityException e) {
-                Log.d("TAG1", "SecurityException: " + e.getMessage());
+        //Инициализируем User.coordinates последними координатами
+        fusedLocationClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location != null){
+                    User.getInstance().setCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
+                    Log.d("TAG-MapHandlerInf", "LastLocation set");
+                    Toast.makeText(context, "LocationSet, " + User.getInstance().getCoordinates(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d("TAG-MapHandlerErr", "LastLocation can not be set");
+                    Toast.makeText(context, "Location is not set", Toast.LENGTH_SHORT).show();
+                }
             }
+        });
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(5000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        SettingsClient client = LocationServices.getSettingsClient(context);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        locationCallback = setLocationCallback();
+        try {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+            //mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, mlocationListener);
+        } catch (NullPointerException e) {
+            Log.d("TAG1", "SecurityException: " + e.getMessage());
+        }
     }
 
-    //Запрещает LocationListener`у запрашивать координаты
+    private LocationCallback setLocationCallback(){
+        locationCallback = new LocationCallback(){
+            int n = 3;
+            @Override
+            public void onLocationResult(LocationResult locationResult){
+                if(locationResult != null){
+                    Location loc = locationResult.getLocations().get(locationResult.getLocations().size()-1);
+                    locationUpdateCounter++;
+                    User.getInstance().setCoordinates(new LatLng(loc.getLatitude(), loc.getLongitude()));
+                    //Обновляем местоположение пользователя на сервере каждые n приемов GPS
+                    /*if(locationUpdateCounter == n){
+                        locationUpdateCounter = 0;
+                        NetworkService.getInstance().sendLocation(new LatLng(loc.getLatitude(), loc.getLongitude()));
+                        Log.d("MapHandlerInf", "Location sent");
+                        Toast.makeText(context, "Location sent", Toast.LENGTH_SHORT).show();
+                    }*/
+                    //Toast.makeText(context, "Location updated " + User.getInstance().getCoordinates().latitude + " " + User.getInstance().getCoordinates().longitude, Toast.LENGTH_SHORT).show();
+                    setUserMarker();
+                } else {
+                    Log.d("TAG-MapHandlerErr", "received location == null");
+                }
+            }
+        };
+        return (locationCallback);
+    }
+
     private void stopLocationUpdates() {
-        mLocationManager.removeUpdates(mlocationListener);
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     //Вынес установку маркера игрока в отдельный метод
@@ -222,29 +296,4 @@ public class MapHandler implements OnMapReadyCallback, GoogleMap.OnCameraIdleLis
         }
 
     }
-
-
-    LocationListener mlocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            User.getInstance().setCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
-            Toast.makeText(context, "Location updated " + User.getInstance().getCoordinates().latitude + " " + User.getInstance().getCoordinates().longitude, Toast.LENGTH_SHORT).show();
-            setUserMarker();
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-            Log.d("GPS", "Provider is enabled");
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
-    };
 }

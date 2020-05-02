@@ -39,11 +39,6 @@ public class MapFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        /*supportMapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.map);
-        if(supportMapFragment == null){
-            Log.d("TAG", "amp null");
-        }*/
         view = inflater.inflate(R.layout.fragment_map, container, false);
         return(view);
     }

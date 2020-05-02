@@ -1,10 +1,17 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.AppObjects;
 
 import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
 //singleton
 public class User {
+
+    private LatLng coordinates;
+    private String token;
+    private String nickname;
+    private Bitmap avatar;
+    private int level;
+
     public static User instance;
 
     private User(String token, String nickname, int level){
@@ -32,11 +39,6 @@ public class User {
         }
     }
 
-    private LatLng coordinates;
-    private String token;
-    private String nickname;
-    private Bitmap avatar;
-    private int level;
 
     public LatLng getCoordinates(){
         return(coordinates);

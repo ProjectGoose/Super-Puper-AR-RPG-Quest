@@ -1,29 +1,29 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.Network;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class LoginResponse {
-    @SerializedName("responseCode")
+    /*@SerializedName("responseCode")
     @Expose
-    private int responseCode;
+    private int responseCode;*/
     @SerializedName("token")
     @Expose
     private String token;
-    @SerializedName("nickname")
+    /*@SerializedName("nickname")
     @Expose
     private String nickname;
     @SerializedName("level")
     @Expose
-    private int level;
+    private int level;*/
 
-    public int getResponseCode() {
+    /*public int getResponseCode() {
         return responseCode;
     }
 
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
-    }
+    }*/
 
     public String getToken() {
         return token;
@@ -33,7 +33,7 @@ public class LoginResponse {
         this.token = token;
     }
 
-    public String getNickname() {
+   /* public String getNickname() {
         return nickname;
     }
 
@@ -47,6 +47,6 @@ public class LoginResponse {
 
     public void setLevel(int level) {
         this.level = level;
-    }
+    }*/
 
 }

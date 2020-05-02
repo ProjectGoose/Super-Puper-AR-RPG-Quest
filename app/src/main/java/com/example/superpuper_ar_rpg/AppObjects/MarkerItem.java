@@ -1,4 +1,4 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.AppObjects;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
