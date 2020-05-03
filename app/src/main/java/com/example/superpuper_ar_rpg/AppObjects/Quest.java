@@ -3,9 +3,9 @@ package com.example.superpuper_ar_rpg.AppObjects;
 import com.google.android.gms.maps.model.LatLng;
 
 public abstract class Quest {
-    public String title;
-    public String text;
-    public String author;
+    protected String title;
+    protected String text;
+    protected String author;
 
     public String getTitle(){
         return(title);

@@ -1,25 +1,22 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.superpuper_ar_rpg.AppObjects.User;
 
 import com.example.superpuper_ar_rpg.Network.NetworkService;
+import com.example.superpuper_ar_rpg.R;
 
 import retrofit2.Call;
 import retrofit2.Callback;

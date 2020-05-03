@@ -18,4 +18,5 @@
     <string name="title_map">Карта</string>
     <string name="authWrongPassword">Неверный логин или пароль</string>
     <string name="authFail">Не удалось установить связь с сервером</string>
+    <string name="btn_pickQuest">Приступить</string>
 </resources>

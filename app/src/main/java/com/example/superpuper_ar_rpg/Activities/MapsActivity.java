@@ -1,4 +1,4 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.Activities;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -35,6 +35,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.example.superpuper_ar_rpg.MapHandler;
+import com.example.superpuper_ar_rpg.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
@@ -56,7 +58,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.INTERNET;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener/*, *//*GoogleMap.OnCameraIdleListener*/ {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     public static LocationManager mLocationManager;
     private ImageButton btnFindLocation;
@@ -106,15 +108,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStart();
         mapView = findViewById(R.id.map);
         mapView.getMapAsync(this);
-        /*if(mapView != null){
-            mapView.onCreate(null);
-            mapView.onResume();
-            mapHandler = new MapHandler(mapView, this, fusedLocationClient);
-            mapHandler.start();
-            Log.d("TAG", "MapHandler started");
-        } else {
-            Log.d("TAG", "mapView = null");
-        }*/
         Log.d("ActivityState", "onStart");
     }
 
@@ -122,27 +115,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         gmap = googleMap;
         mapHandler = new MapHandler(gmap, this, fusedLocationClient);
-        //mapHandler.start();
-        //gmap.setOnCameraIdleListener(this);
-        //gmap.setOnMarkerClickListener(this);
-        gmap.addMarker(new MarkerOptions()
-                .position(new LatLng(0,0))
-                .title("Sydney"));
-
+        mapHandler.start();
     }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        Log.d("TAG-", "mapsCLICKED");
-        return false;
-    }
-
-    //TEST!!!
-    /*@Override
-    public void onCameraIdle(){
-        Log.d("TAG", "IDLE");
-    }*/
-
 
     @Override
     protected void onResume(){

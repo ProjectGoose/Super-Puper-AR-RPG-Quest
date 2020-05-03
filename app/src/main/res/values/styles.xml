@@ -22,4 +22,8 @@
         <item name="android:typeface">monospace</item>
     </style>
 
+    <style name="roundedButton">
+        <item name="background">@drawable/round_button</item>
+    </style>
+
 </resources>

@@ -1,6 +1,5 @@
 package com.example.superpuper_ar_rpg.UI;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,21 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.example.superpuper_ar_rpg.MapHandler;
-import com.example.superpuper_ar_rpg.MapsActivity;
 import com.example.superpuper_ar_rpg.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.internal.IMapViewDelegate;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFragment extends Fragment{
 
@@ -35,10 +23,12 @@ public class MapFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("ActivityStateFrag", "OnCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        Log.d("ActivityStateFrag", "OnCreateView");
         view = inflater.inflate(R.layout.fragment_map, container, false);
         return(view);
     }
@@ -46,17 +36,20 @@ public class MapFragment extends Fragment{
     @Override
     public void onResume(){
         super.onResume();
+        Log.d("ActivityStateFrag", "OnResume");
         mapView.onResume();
     }
 
     @Override
     public void onPause(){
         super.onPause();
+        Log.d("ActivityStateFrag", "OnPause");
         mapView.onPause();
     }
     @Override
     public void onStop(){
         super.onStop();
+        Log.d("ActivityStateFrag", "OnStop");
         mapView.onStop();
     }
 

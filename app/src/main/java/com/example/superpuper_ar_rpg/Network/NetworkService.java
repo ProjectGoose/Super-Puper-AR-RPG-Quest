@@ -1,14 +1,9 @@
 package com.example.superpuper_ar_rpg.Network;
 
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.User;
-import com.example.superpuper_ar_rpg.LoginActivity;
-import com.example.superpuper_ar_rpg.MapsActivity;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;

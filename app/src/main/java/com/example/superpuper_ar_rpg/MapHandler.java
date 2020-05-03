@@ -1,26 +1,20 @@
 package com.example.superpuper_ar_rpg;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
+import com.example.superpuper_ar_rpg.Activities.QuestActivity;
 import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
-import com.example.superpuper_ar_rpg.Network.NetworkService;
-import com.example.superpuper_ar_rpg.UI.QuestInfoFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 import com.google.android.gms.location.LocationCallback;
@@ -32,23 +26,19 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 
-public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener {
+public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     private Context context;
     private FusedLocationProviderClient fusedLocationClient;
@@ -58,6 +48,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
     //private MapView mapView;
     private int locationUpdateCounter = 0;
     private LocationCallback locationCallback;
+    private Button questInfoButton;
 
     //debug
     public static boolean isMocking = false;
@@ -76,41 +67,50 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
     private boolean locating = false;
 
     public MapHandler(GoogleMap map, Context context, FusedLocationProviderClient fusedLocationClient) {
-        map.setOnCameraIdleListener(this);
-        //clusterManager = new ClusterManager<>(context, map);
-        map.setOnMarkerClickListener(this);
-        /*clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MarkerItem>() {
-            @Override
-            public boolean onClusterClick(Cluster<MarkerItem> cluster) {
-                Log.d("TAG-", "Cluster clicked");
-                return false;
-            }
-        });*/
-        //map.setOnCameraIdleListener(clusterManager);
-        /*for(int i =0; i < parsedQuests.size(); i++) {
-        MarkerItem markerItem = new MarkerItem(parsedQuests.get(i).coordinates.latitude,parsedQuests.get(i).coordinates.longitude);
-        clusterManager.addItem(markerItem);
-    }*/
-        /*map.addMarker(new MarkerOptions()
-                .position(new LatLng(10,10))
-                .title("Sydney2"));*/
         this.map = map;
         this.context = context;
         this.fusedLocationClient = fusedLocationClient;
 
-    }
+        questInfoButton = ((Activity)context).findViewById(R.id.bt_questInfo);
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        Log.d("TAG-", "mapsCLICKED");
-        return false;
+        //Устанавливаем кластеризацию
+        clusterManager = new ClusterManager<MarkerItem>(context, map);
+        map.setOnCameraIdleListener(this);
+        map.setOnMarkerClickListener(clusterManager);
+
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerItem>() {
+            //При нажатии на маркер:
+            @Override
+            public boolean onClusterItemClick(MarkerItem item) {
+                questInfoButton.setText(item.getTitle() + "\n" + item.getRating());
+                questInfoButton.setVisibility(View.VISIBLE);
+
+                questInfoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent goToQuest = new Intent(context, QuestActivity.class);
+                        goToQuest.putExtra("title", item.getTitle());
+                        goToQuest.putExtra("rating", item.getRating());
+                        goToQuest.putExtra("description", item.getDescription());
+                        ((Activity)context).startActivity(goToQuest);
+                    }
+                });
+                return true; //true - чтобы отключить дефолтное поведение при нажатии
+            }
+        });
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.d("TAG-MapHandlerInf", "Map clicked");
+                questInfoButton.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     public void start() {
         startLocationUpdates();
         getQuests();
     }
-
 
     public void stop() {
         stopLocationUpdates();
@@ -150,8 +150,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
     }*/
 
 
-
-
     //колбэк листенера
     /*@Override
     public void onCameraIdle(){
@@ -163,29 +161,31 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
         }*//*
     }*/
 
+
+
     private boolean flag = true; //временно
     @Override
     public void onCameraIdle(){
-        /*Log.d("TAG", "onCameraIdle");
+        Log.d("TAG", "onCameraIdle");
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
         ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
         //parsedQuests1 = NetworkService.getInstance().requestQuests(new QuestsBody(User.getInstance().getCoordinates(), visReg, "12345678"));
-        *//*if(flag) {
+        if(flag) {
             parsedQuests1 = parsedQuests; //затычка
             flag = false;
         } else {
             parsedQuests1.clear();
             flag = true;
             Log.d("TAG", "flag = " + flag);
-        }*//*
-        parsedQuests1 = parsedQuests; //временно
+        }
+        //parsedQuests1 = parsedQuests; //временно
         ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
         clusterManager.clearItems();
         for(MapQuest buf: parsedQuests1){
-            Log.d("TAG", "buf " + buf.coordinates);
-            clusterManager.addItem(new MarkerItem(buf.coordinates.latitude, buf.coordinates.longitude));
+            Log.d("TAG", "buf " + buf.getCoordinates());
+            clusterManager.addItem(new MarkerItem(buf.getCoordinates().latitude, buf.getCoordinates().longitude, buf.getTitle(), "What is the snippet?", buf.getRating(), buf.getText()));
         }
-        clusterManager.cluster();*/
+        clusterManager.cluster();
     }
 
     public void getQuests(){
@@ -198,13 +198,12 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
     class GetQuestsThread extends Thread{
         @Override
         public void run(){
-            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа", "По неизвестным причинам с 16 марта объяевлен карантин. " +
-                    "Возможный лут: резиновые члены, кожаные костюмы, Карпов. " +
-                    "Рекомендуется взять автомат, патроны, противогаз", new LatLng(55.669696, 37.481083)));
-            parsedQuests.add(new MapQuest("Взорвать дом разраба", "text", new LatLng(55.671313, 37.285355)));
-            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811)));
-            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733)));
-            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637)));
+            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
+                    "Возможный лут: резиновые члены, кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
+            parsedQuests.add(new MapQuest("Взорвать дом разраба", "text", new LatLng(55.671313, 37.285355), 2));
+            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
+            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
+            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
         }
     }
 

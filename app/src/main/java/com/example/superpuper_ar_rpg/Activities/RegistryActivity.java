@@ -1,4 +1,4 @@
-package com.example.superpuper_ar_rpg;
+package com.example.superpuper_ar_rpg.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.superpuper_ar_rpg.R;
+import com.example.superpuper_ar_rpg.Activities.LoginActivity;
 
 public class RegistryActivity extends AppCompatActivity {
 
