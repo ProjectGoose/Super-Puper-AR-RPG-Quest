@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.superpuper_ar_rpg.Activities.MapsActivity;
 import com.example.superpuper_ar_rpg.R;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -24,6 +26,7 @@ public class MapFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("ActivityStateFrag", "OnCreate");
+        setRetainInstance(true);
     }
 
     @Override
@@ -34,10 +37,17 @@ public class MapFragment extends Fragment{
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("ActivityState", "OnStart");
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         Log.d("ActivityStateFrag", "OnResume");
         mapView.onResume();
+        //((MapsActivity)getActivity()).activateMap(mapView);
     }
 
     @Override
@@ -54,13 +64,33 @@ public class MapFragment extends Fragment{
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("ActivityStateFrag", "OnDestroyView");
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("ActivityStateFrag", "OnDestroy");
+    }
+
+    @Override
+    public void onAttachFragment(@NonNull Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        Log.d("ActivityStateFrag", "OnAttach");
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
+        Log.d("ActivityStateFrag", "OnViewCreated");
         mapView =  (MapView) view.findViewById(R.id.map);
         if(mapView != null){
             Log.d("TAG", "mapView != null");
             mapView.onCreate(null);
-            //mapView.onResume();
+            ((MapsActivity)getActivity()).activateMap(mapView);
         }
     }
 

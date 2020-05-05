@@ -106,10 +106,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStart() {
         super.onStart();
-        mapView = findViewById(R.id.map);
-        mapView.getMapAsync(this);
+        //activateMap(mapView); //удивительно, но если это раскомментировать, то при входе из описания квеста карта ломается
         Log.d("ActivityState", "onStart");
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -138,7 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStop() {
         super.onStop();
-        //mapHandler.stop();
+        mapHandler.stop();
         Log.d("ActivityState", "onStop");
     }
 
@@ -148,6 +148,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d("ActivityState", "onDestroy");
     }
 
+    //Вызывается фрагментом при каждом его пересоздании
+    public void activateMap(MapView thisMapView){
+        thisMapView = findViewById(R.id.map);
+        thisMapView.getMapAsync(this);
+    }
 
     private boolean checkPermission(Context context, String[] permissions){
         Boolean flag = true;

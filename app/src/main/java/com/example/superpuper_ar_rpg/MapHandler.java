@@ -133,35 +133,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         return centering;
     }
 
-    /*@Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        map.setOnCameraIdleListener(this);
-        Log.d("MAP", "Zoom: " + Float.toString(googleMap.getCameraPosition().zoom));
-        clusterManager = new ClusterManager<MarkerItem>(context, map);
-        //map.setOnCameraIdleListener(clusterManager);
-        map.setOnMarkerClickListener(clusterManager);
-        *//*for(int i =0; i < parsedQuests.size(); i++) {
-            MarkerItem markerItem = new MarkerItem(parsedQuests.get(i).coordinates.latitude,parsedQuests.get(i).coordinates.longitude);
-            clusterManager.addItem(markerItem);
-        }*//*
-
-        map.setOnMarkerClickListener(this);
-    }*/
-
-
-    //колбэк листенера
-    /*@Override
-    public void onCameraIdle(){
-        *//*VisibleRegion visreg = map.getProjection().getVisibleRegion(); //получает координаты углов области карты, отображаемой на экране в данный момент
-        MarkerAppender mApp = new MarkerAppender(visreg, parsedQuests);
-        if(!mApp.isAlive()) {
-            //mApp.start();
-            Log.d("TAG", "Thread started");
-        }*//*
-    }*/
-
-
 
     private boolean flag = true; //временно
     @Override
@@ -170,15 +141,15 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
         ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
         //parsedQuests1 = NetworkService.getInstance().requestQuests(new QuestsBody(User.getInstance().getCoordinates(), visReg, "12345678"));
-        if(flag) {
+        /*if(flag) {
             parsedQuests1 = parsedQuests; //затычка
             flag = false;
         } else {
             parsedQuests1.clear();
             flag = true;
             Log.d("TAG", "flag = " + flag);
-        }
-        //parsedQuests1 = parsedQuests; //временно
+        }*/
+        parsedQuests1 = parsedQuests; //временно
         ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
         clusterManager.clearItems();
         for(MapQuest buf: parsedQuests1){
@@ -266,6 +237,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     private void stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback);
+        Log.d("TAG-MapHandlerInf", "Location updates removed");
     }
 
     //Вынес установку маркера игрока в отдельный метод
