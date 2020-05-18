@@ -15,6 +15,8 @@ import com.example.superpuper_ar_rpg.Activities.QuestActivity;
 import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.example.superpuper_ar_rpg.Network.NetworkService;
+import com.example.superpuper_ar_rpg.Network.QuestsRequestBody;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 import com.google.android.gms.location.LocationCallback;
@@ -38,6 +40,10 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     private Context context;
@@ -45,7 +51,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     private GoogleMap map; //Добавляем нормальный объект карты, а не все эти извращения
     private ArrayList<MapQuest> parsedQuests = new ArrayList<>();//Хранит квесты, запарсенные из json(предположительно) файла, полученного от сервера
     private ClusterManager<MarkerItem> clusterManager; //кластеризатор
-    //private MapView mapView;
     private int locationUpdateCounter = 0;
     private LocationCallback locationCallback;
     private Button questInfoButton;
@@ -140,23 +145,31 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         Log.d("TAG", "onCameraIdle");
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
         ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
-        //parsedQuests1 = NetworkService.getInstance().requestQuests(new QuestsBody(User.getInstance().getCoordinates(), visReg, "12345678"));
-        /*if(flag) {
-            parsedQuests1 = parsedQuests; //затычка
-            flag = false;
-        } else {
-            parsedQuests1.clear();
-            flag = true;
-            Log.d("TAG", "flag = " + flag);
-        }*/
-        parsedQuests1 = parsedQuests; //временно
-        ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
-        clusterManager.clearItems();
-        for(MapQuest buf: parsedQuests1){
-            Log.d("TAG", "buf " + buf.getCoordinates());
-            clusterManager.addItem(new MarkerItem(buf.getCoordinates().latitude, buf.getCoordinates().longitude, buf.getTitle(), "What is the snippet?", buf.getRating(), buf.getText()));
-        }
-        clusterManager.cluster();
+        NetworkService.getInstance().requestQuests(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MapQuest>>() {
+            @Override
+            public void onResponse(Call<ArrayList<MapQuest>> call, Response<ArrayList<MapQuest>> response) {
+                if(response.isSuccessful()){
+                    Log.d("NETWORKInf", "Server returned array with " + response.body().size() + " quests");
+                    parsedQuests1.addAll(response.body());
+                    ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
+                    clusterManager.clearItems();
+                    for(MapQuest buf: parsedQuests1){
+                        Log.d("TAG", "buf " + buf.getCoordinates());
+                        clusterManager.addItem(new MarkerItem(buf.getLatitude(), buf.getLongitude(), buf.getTitle(), "What?",  buf.getRating(), buf.getText()));
+                    }
+                    clusterManager.cluster();
+                } else {
+                    Log.d("NETWORKInf", "Response is unsuccessful");
+                }
+
+            }
+            @Override
+            public void onFailure(Call<ArrayList<MapQuest>> call, Throwable t) {
+                Log.d("NETWORKInf", "Failed to get quests");
+            }
+        });
+        Log.d("TAG-MapHandler-Inf", "Received: " + parsedQuests1.size());
+
     }
 
     public void getQuests(){
@@ -170,8 +183,8 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         @Override
         public void run(){
             parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
-                    "Возможный лут: резиновые члены, кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
-            parsedQuests.add(new MapQuest("Взорвать дом разраба", "text", new LatLng(55.671313, 37.285355), 2));
+                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
+            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
             parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
             parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
             parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
@@ -211,7 +224,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     private LocationCallback setLocationCallback(){
         locationCallback = new LocationCallback(){
-            int n = 3;
+            int n = 10;
             @Override
             public void onLocationResult(LocationResult locationResult){
                 if(locationResult != null){
@@ -219,12 +232,10 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
                     locationUpdateCounter++;
                     User.getInstance().setCoordinates(new LatLng(loc.getLatitude(), loc.getLongitude()));
                     //Обновляем местоположение пользователя на сервере каждые n приемов GPS
-                    /*if(locationUpdateCounter == n){
+                    if(locationUpdateCounter == n){
                         locationUpdateCounter = 0;
-                        NetworkService.getInstance().sendLocation(new LatLng(loc.getLatitude(), loc.getLongitude()));
-                        Log.d("MapHandlerInf", "Location sent");
-                        Toast.makeText(context, "Location sent", Toast.LENGTH_SHORT).show();
-                    }*/
+                        NetworkService.getInstance().sendLocation(User.getInstance().getToken(), new LatLng(loc.getLatitude(), loc.getLongitude()));
+                    }
                     //Toast.makeText(context, "Location updated " + User.getInstance().getCoordinates().latitude + " " + User.getInstance().getCoordinates().longitude, Toast.LENGTH_SHORT).show();
                     setUserMarker();
                 } else {

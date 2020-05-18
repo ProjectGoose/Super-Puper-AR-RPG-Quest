@@ -7,6 +7,7 @@ import com.example.superpuper_ar_rpg.AppObjects.User;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -22,6 +23,7 @@ public class NetworkService  {
 
     //Базовый URL сервера
     private static String URL = "http://super-puper-ar-android-quest.herokuapp.com";
+
     private Retrofit retrofit;
     private ServerAPI api;
     //Для тестирования plain text response
@@ -46,37 +48,6 @@ public class NetworkService  {
     }
 
 
-    public Boolean login(String login, String password){
-        Boolean[] flag = {false};
-        Call<LoginResponse> call = api.loginUser(login, password);
-        call.enqueue(new Callback<LoginResponse>(){
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response){
-                if(response.isSuccessful()){
-                    Log.d("NETWORK", "Response code is " + response.body() );
-                    if(!response.body().getToken().equals("null")) {
-                        flag[0] = true;
-                        try {
-                            //User.firstSetInstance(response.body().getToken(), response.body().getNickname(), response.body().getLevel());
-                            User.firstSetInstance(response.body().getToken(), login, 1);
-                        } catch (NullPointerException e){
-                            Log.d("NETWORKInf", "Exception: " + e.getMessage());
-                        }
-                    } else {
-                        Log.d("NETWORKInf", "Wrong login or password");
-                    }
-                } else {
-                    Log.d("NETWORKInf", "Something gone wrong");
-                }
-            }
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t){
-                Log.d("NETWORKErr", "Auth can not be sent " + t.getMessage());
-            }
-        });
-        return flag[0];
-    }
-
     //Test, plain text response
     public void loginTest(Callback<String> callback, String login, String password){
         Call<String> stringCall = apiTest.loginUserTest(login, password);
@@ -84,13 +55,17 @@ public class NetworkService  {
     }
 
 
-    public void sendLocation(LatLng location){
-        Call<String> stringCall = api.sendLocation(User.getInstance().getToken(), location);
+    public void sendLocation(String token, LatLng location){
+        Call<String> stringCall = api.sendLocation("token=" + token, new SendLocationBody(location.latitude, location.longitude));
+        ArrayList<Boolean> flag = new ArrayList<>();
+        flag.add(false);
         stringCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if(response.isSuccessful()){
-                    Log.d("NETWORKInf", "Location sent successfully");
+                    if(response.body() == "true") {
+                        Log.d("NETWORKInf", "Location sent successfully");
+                    }
                 } else {
                     Log.d("NETWORKInf", "Location sent unsuccessfully");
                 }
@@ -104,21 +79,8 @@ public class NetworkService  {
     }
 
 
-    public ArrayList<MapQuest> requestQuests(QuestsBody questsBody){
-        Call<ArrayList<MapQuest>> parsedQuests = api.updateQuests(questsBody);
-        ArrayList<MapQuest> buffer = new ArrayList<>();
-        parsedQuests.enqueue(new Callback<ArrayList<MapQuest>>() {
-            @Override
-            public void onResponse(Call<ArrayList<MapQuest>> call, Response<ArrayList<MapQuest>> response) {
-                Log.d("NETWORK", "Server returned array with " + response.body().size() + " quests");
-                buffer.addAll(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<MapQuest>> call, Throwable t) {
-
-            }
-        });
-        return(buffer);
+    public void requestQuests(String token, QuestsRequestBody questsRequestBody, Callback callback){
+        Call<ArrayList<MapQuest>> parsedQuests = api.requestQuestsInRange("token="+token, questsRequestBody.getTop(), questsRequestBody.getBottom(), questsRequestBody.getLeft(), questsRequestBody.getRight());
+        parsedQuests.enqueue(callback);
     }
 }

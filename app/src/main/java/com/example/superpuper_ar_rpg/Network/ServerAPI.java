@@ -4,6 +4,7 @@ import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -23,10 +24,14 @@ public interface ServerAPI {
     @FormUrlEncoded
     @POST("/user-controller/login")
     Call<String> loginUserTest(@Field("login") String login, @Field("password") String password);
-    @POST("/app/Quests")
-    Call<ArrayList<MapQuest>> updateQuests(@Body QuestsBody questsBody);
+
     @POST("/user-controller/location-update")
-    Call<String> sendLocation(@Header("token")String token, @Field("LatLng")LatLng location);
+    Call<String> sendLocation(@Header("Cookie")String token, @Body SendLocationBody locationBody);
+
+    @FormUrlEncoded
+    @POST("/quest/getAllInRange")
+    Call<ArrayList<MapQuest>> requestQuestsInRange(@Header("Cookie")String token, @Field("top")double top,
+                                                   @Field("bottom")double bottom, @Field("left")double left, @Field("right")double right);
 
 }
 
