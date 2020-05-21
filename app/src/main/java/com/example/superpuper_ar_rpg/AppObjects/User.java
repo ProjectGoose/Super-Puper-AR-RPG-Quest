@@ -11,6 +11,19 @@ public class User {
     private String nickname;
     private Bitmap avatar;
     private int level;
+    private int age;
+    private Race race;
+
+    enum Race{
+        ORK("Орк"), ELF("Эльф"), HUMAN ("Человек"), HOBBIT("Хоббит");
+
+        private String title;
+        Race(String title){
+            this.title = title;
+        }
+
+        public String getTitle(){ return title;};
+    }
 
     public static User instance;
 
@@ -20,6 +33,9 @@ public class User {
         this.nickname = nickname;
         this.level = level;
         this.coordinates = new LatLng(0,0);
+
+        //TODO delete debug feature
+        debugInitial();
     }
 
     public static User getInstance() throws NullPointerException{
@@ -39,6 +55,11 @@ public class User {
         }
     }
 
+    private void debugInitial(){
+        age = 54;
+        race = Race.ORK;
+    }
+
 
     public LatLng getCoordinates(){
         return(coordinates);
@@ -52,6 +73,8 @@ public class User {
     public String getToken(){
         return(token);
     }
+    public String getRace(){return race.title;}
+    public int getAge(){return age;}
 
     public void setCoordinates(LatLng coordinates) {
         this.coordinates = coordinates;
