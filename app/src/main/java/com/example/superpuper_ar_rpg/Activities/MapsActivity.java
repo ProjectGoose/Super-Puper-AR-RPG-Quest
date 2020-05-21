@@ -61,8 +61,6 @@ import static android.Manifest.permission.INTERNET;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     public static LocationManager mLocationManager;
-    private ImageButton btnFindLocation;
-    private ImageButton btnCentering;
     private MapView mapView;
     private FusedLocationProviderClient fusedLocationClient;
     private int requestCode;
@@ -86,14 +84,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         NavigationUI.setupWithNavController(bottomNav, navController);
 
-        /*
-        btnFindLocation = findViewById(R.id.btn_find_location);
-        btnFindLocation.setBackground(getDrawable(R.drawable.target_off));
-        btnCentering = findViewById(R.id.btn_centering);
-        btnCentering.setVisibility(View.INVISIBLE);
-        btnCentering.setBackground(getDrawable(R.drawable.centering_off));
-        btnCentering.setClickable(false);
-        */
 
         if(!checkPermission(this, permissions)){
             ActivityCompat.requestPermissions(this, permissions, requestCode);
@@ -190,35 +180,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    /*public void onMapInteractionButtonPressed(View view){
+    public void onMapInteractionButtonPressed(View view){
         Log.d("Button", "Ouu, my");
-        switch (view.getId()){
-            case R.id.btn_find_location:
-                if(mapHandler.isLocating()){
-                    btnFindLocation.setBackground(getDrawable(R.drawable.target_off));
-                    mapHandler.setLocating(false);
-                    btnCentering.setVisibility(View.INVISIBLE);
-                    btnCentering.setClickable(false);
-                }
-                else{
-                    btnFindLocation.setBackground(getDrawable(R.drawable.target_on));
-                    mapHandler.setLocating(true);
-                    mapHandler.setCentering(false);
-                    btnCentering.setVisibility(View.VISIBLE);
-                    btnCentering.setClickable(true);
-                }
-                break;
-            case R.id.btn_centering:
-                if(mapHandler.isCentering()){
-                    mapHandler.setCentering(false);
-                    btnCentering.setBackground(getDrawable(R.drawable.centering_off));
-                }
-                else {
+        if (view.getId() == R.id.btn_centering) {
+            if (mapHandler.isCentering()) {
+                mapHandler.setCentering(false);
+                view.setBackground(getDrawable(R.drawable.centering_off));
+            } else {
+                if(mLocationManager.isProviderEnabled("gps")){
                     mapHandler.setCentering(true);
-                    btnCentering.setBackground(getDrawable(R.drawable.centering_on));
+                    mapHandler.zoomUser();
+                    view.setBackground(getDrawable(R.drawable.centering_on));
                 }
-                break;
+            }
         }
 
-    }*/
+    }
 }

@@ -26,6 +26,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -69,7 +70,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     private Circle userCircle;
     private boolean firstStart = true;
     private boolean centering = false;
-    private boolean locating = false;
+    private boolean locating = true;
 
     public MapHandler(GoogleMap map, Context context, FusedLocationProviderClient fusedLocationClient) {
         this.map = map;
@@ -130,12 +131,14 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         return locating;
     }
 
-    public void setCentering(boolean centering) {
-        this.centering = centering;
-    }
+    public void setCentering(boolean centering) { this.centering = centering; }
 
     public boolean isCentering() {
         return centering;
+    }
+
+    public void zoomUser(){
+        map.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
 
 

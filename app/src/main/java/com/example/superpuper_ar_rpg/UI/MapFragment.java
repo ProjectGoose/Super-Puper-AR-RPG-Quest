@@ -1,10 +1,12 @@
 package com.example.superpuper_ar_rpg.UI;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -21,6 +23,7 @@ public class MapFragment extends Fragment{
     Fragment fg;
     SupportMapFragment supportMapFragment;
     View view;
+    ImageButton btn_isCentering;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,9 @@ public class MapFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
+        btn_isCentering = view.findViewById(R.id.btn_centering);
+        btn_isCentering.setBackground(view.getContext().getDrawable(R.drawable.centering_off));
+        btn_isCentering.setClickable(true);
         Log.d("ActivityState", "OnStart");
     }
 
@@ -93,6 +99,5 @@ public class MapFragment extends Fragment{
             ((MapsActivity)getActivity()).activateMap(mapView);
         }
     }
-
 
 }
