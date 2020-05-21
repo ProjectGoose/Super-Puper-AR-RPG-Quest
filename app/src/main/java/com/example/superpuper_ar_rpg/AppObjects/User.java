@@ -3,6 +3,9 @@ package com.example.superpuper_ar_rpg.AppObjects;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+
 //singleton
 public class User {
 
@@ -11,6 +14,7 @@ public class User {
     private String nickname;
     private Bitmap avatar;
     private int level;
+    private ArrayList<Long> activeQuests = new ArrayList<>();
 
     public static User instance;
 
@@ -39,6 +43,9 @@ public class User {
         }
     }
 
+    public ArrayList<Long> getActiveQuests() {
+        return activeQuests;
+    }
 
     public LatLng getCoordinates(){
         return(coordinates);

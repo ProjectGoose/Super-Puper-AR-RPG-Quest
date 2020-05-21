@@ -7,21 +7,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class MapQuest extends Quest {
     private LatLng coordinates;
-    @SerializedName("latitude")
-    @Expose
-    private double latitude;
-    @SerializedName("longitude")
-    @Expose
-    private double longitude;
-    @SerializedName("rating")
-    @Expose
     private double rating;
     //Изображение, дата добавления, ссылки, автор...
-    public MapQuest(String title, String txt, LatLng coord, int rating){
+    public MapQuest(String title, String txt, LatLng coord, double rating, long id){
         this.title = title;
         this.coordinates = coord;
         this.text = txt;
         this.rating = rating;
+        this.id = id;
     }
 
     public double getRating(){
@@ -32,12 +25,12 @@ public class MapQuest extends Quest {
         return coordinates;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public void setCoordinates(LatLng coordinates) {
+        this.coordinates = coordinates;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 }
 

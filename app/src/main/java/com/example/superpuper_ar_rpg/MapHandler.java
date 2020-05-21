@@ -48,8 +48,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     private Context context;
     private FusedLocationProviderClient fusedLocationClient;
-    private GoogleMap map; //Добавляем нормальный объект карты, а не все эти извращения
-    private ArrayList<MapQuest> parsedQuests = new ArrayList<>();//Хранит квесты, запарсенные из json(предположительно) файла, полученного от сервера
+    private GoogleMap map;
     private ClusterManager<MarkerItem> clusterManager; //кластеризатор
     private int locationUpdateCounter = 0;
     private LocationCallback locationCallback;
@@ -94,9 +93,11 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
                     @Override
                     public void onClick(View v) {
                         Intent goToQuest = new Intent(context, QuestActivity.class);
+                        goToQuest.putExtra("questID", item.getId());
                         goToQuest.putExtra("title", item.getTitle());
                         goToQuest.putExtra("rating", item.getRating());
-                        goToQuest.putExtra("description", item.getDescription());
+                        goToQuest.putExtra("lat", item.getLatitude());
+                        goToQuest.putExtra("lng", item.getLongitude());
                         ((Activity)context).startActivity(goToQuest);
                     }
                 });
@@ -114,7 +115,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     public void start() {
         startLocationUpdates();
-        getQuests();
     }
 
     public void stop() {
@@ -139,23 +139,18 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     }
 
 
-    private boolean flag = true; //временно
     @Override
     public void onCameraIdle(){
         Log.d("TAG", "onCameraIdle");
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
-        ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
-        NetworkService.getInstance().requestQuests(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MapQuest>>() {
+        NetworkService.getInstance().requestQuestsInRange(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MarkerItem>>() {
             @Override
-            public void onResponse(Call<ArrayList<MapQuest>> call, Response<ArrayList<MapQuest>> response) {
+            public void onResponse(Call<ArrayList<MarkerItem>> call, Response<ArrayList<MarkerItem>> response) {
                 if(response.isSuccessful()){
                     Log.d("NETWORKInf", "Server returned array with " + response.body().size() + " quests");
-                    parsedQuests1.addAll(response.body());
-                    ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
                     clusterManager.clearItems();
-                    for(MapQuest buf: parsedQuests1){
-                        Log.d("TAG", "buf " + buf.getCoordinates());
-                        clusterManager.addItem(new MarkerItem(buf.getLatitude(), buf.getLongitude(), buf.getTitle(), "What?",  buf.getRating(), buf.getText()));
+                    for(MarkerItem buf: response.body()){
+                        clusterManager.addItem(buf);
                     }
                     clusterManager.cluster();
                 } else {
@@ -164,32 +159,12 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
             }
             @Override
-            public void onFailure(Call<ArrayList<MapQuest>> call, Throwable t) {
+            public void onFailure(Call<ArrayList<MarkerItem>> call, Throwable t) {
                 Log.d("NETWORKInf", "Failed to get quests");
             }
         });
-        Log.d("TAG-MapHandler-Inf", "Received: " + parsedQuests1.size());
-
     }
 
-    public void getQuests(){
-        Log.d("TAG", "getQuests");
-        GetQuestsThread gqt = new GetQuestsThread();
-        gqt.start();
-    }
-
-    //будет парсить маркеры
-    class GetQuestsThread extends Thread{
-        @Override
-        public void run(){
-            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
-                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
-            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
-            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
-            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
-            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
-        }
-    }
 
 
     private void startLocationUpdates(){

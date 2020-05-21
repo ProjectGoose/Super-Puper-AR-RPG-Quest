@@ -1,33 +1,51 @@
 package com.example.superpuper_ar_rpg.AppObjects;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.google.maps.android.clustering.ClusterItem;
 
 public class MarkerItem implements ClusterItem {
-    private final LatLng mPosition;
+
+    @SerializedName("latitude")
+    @Expose
+    private double latitude;
+    @SerializedName("longitude")
+    @Expose
+    private double longitude;
+    @SerializedName("title")
+    @Expose
     private final String mTitle;
-    private final String mSnippet;
+    @SerializedName("rating")
+    @Expose
     private final double mRating;
-    private final String mDescription;
+    @SerializedName("id")
+    @Expose
+    private final long id;
+
+    private LatLng mPosition = new LatLng(latitude, longitude);
 
     public MarkerItem(double lat, double lng) {
         mPosition = new LatLng(lat, lng);
         mTitle = "";
-        mSnippet = "";
         mRating = 0;
-        mDescription = "";
+        id = 0;
+        latitude = 0;
+        longitude = 0;
     }
 
-    public MarkerItem(double lat, double lng, String title, String snippet, double mRating, String description) {
+    public MarkerItem(double lat, double lng, String title, double mRating, long id) {
+        this.latitude = lat;
+        this.longitude = lng;
         mPosition = new LatLng(lat, lng);
         mTitle = title;
-        mSnippet = snippet;
         this.mRating = mRating;
-        mDescription = description;
+        this.id = id;
     }
 
     @Override
     public LatLng getPosition() {
+        mPosition = new LatLng(latitude, longitude);
         return mPosition;
     }
 
@@ -38,12 +56,22 @@ public class MarkerItem implements ClusterItem {
 
     @Override
     public String getSnippet() {
-        return mSnippet;
+        return null;
     }
 
     public double getRating(){
         return mRating;
     }
 
-    public String getDescription() {return mDescription;}
+    public long getId() {
+        return id;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
 }

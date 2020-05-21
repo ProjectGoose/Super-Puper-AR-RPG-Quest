@@ -3,6 +3,7 @@ package com.example.superpuper_ar_rpg.Network;
 import android.util.Log;
 
 import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
+import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -79,8 +80,13 @@ public class NetworkService  {
     }
 
 
-    public void requestQuests(String token, QuestsRequestBody questsRequestBody, Callback callback){
-        Call<ArrayList<MapQuest>> parsedQuests = api.requestQuestsInRange("token="+token, questsRequestBody.getTop(), questsRequestBody.getBottom(), questsRequestBody.getLeft(), questsRequestBody.getRight());
+    public void requestQuestsInRange(String token, QuestsRequestBody questsRequestBody, Callback callback){
+        Call<ArrayList<MarkerItem>> parsedQuests = api.requestQuestsInRange("token="+token, questsRequestBody.getTop(), questsRequestBody.getBottom(), questsRequestBody.getLeft(), questsRequestBody.getRight());
         parsedQuests.enqueue(callback);
+    }
+
+    public void requestQuestBody(String token, long id, Callback callback){
+        Call<MapQuest> mapQuestCall = api.requestQuestBody("token="+token, id);
+        mapQuestCall.enqueue(callback);
     }
 }

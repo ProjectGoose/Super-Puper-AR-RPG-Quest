@@ -1,6 +1,7 @@
 package com.example.superpuper_ar_rpg.Network;
 
 import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
+import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -27,11 +28,18 @@ public interface ServerAPI {
 
     @POST("/user-controller/location-update")
     Call<String> sendLocation(@Header("Cookie")String token, @Body SendLocationBody locationBody);
-
+/*
     @FormUrlEncoded
     @POST("/quest/getAllInRange")
     Call<ArrayList<MapQuest>> requestQuestsInRange(@Header("Cookie")String token, @Field("top")double top,
-                                                   @Field("bottom")double bottom, @Field("left")double left, @Field("right")double right);
+                                                   @Field("bottom")double bottom, @Field("left")double left, @Field("right")double right);*/
+    @FormUrlEncoded
+    @POST("/quest/getAllInRange")
+    Call<ArrayList<MarkerItem>> requestQuestsInRange(@Header("Cookie")String token, @Field("top")double top,
+                                                     @Field("bottom")double bottom, @Field("left")double left, @Field("right")double right);
 
+    @FormUrlEncoded
+    @POST("/quest/getDeteils")
+    Call<MapQuest> requestQuestBody(@Header("Cookie")String token, @Field("id")long id);
 }
 

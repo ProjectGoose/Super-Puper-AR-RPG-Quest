@@ -28,4 +28,24 @@ public abstract class Quest {
     public String getAuthor(){
         return(author);
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 }
