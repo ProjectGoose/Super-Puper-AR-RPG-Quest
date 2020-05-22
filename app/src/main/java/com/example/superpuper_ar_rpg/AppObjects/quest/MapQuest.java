@@ -28,6 +28,16 @@ public class MapQuest extends Quest {
         this.units = new Gson().fromJson(dto.getBody(), ArrayList.class);
     }
 
+    public MapQuest(MapQuestBriefDto briefDto, MapQuestDetailsDto detailsDto){
+        this.id = briefDto.getId();
+        this.title = briefDto.getTitle();
+        this.author = detailsDto.getAuthor();
+        this.coordinates = new LatLng( briefDto.getLatitude(), briefDto.getLongitude());
+        this.rating = briefDto.getRating();
+        this.body = detailsDto.getBody();
+        this.text = detailsDto.getText();
+    }
+
     public double getRating(){
         return rating;
     }
