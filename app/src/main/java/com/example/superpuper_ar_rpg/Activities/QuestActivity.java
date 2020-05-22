@@ -25,7 +25,6 @@ public class QuestActivity extends AppCompatActivity {
 
         tv_title.setText(getIntent().getExtras().getString("title"));
         tv_rating.setText(getIntent().getExtras().getString("rating"));
-        tv_description.setText(getIntent().getExtras().getString("description"));
 
     }
 

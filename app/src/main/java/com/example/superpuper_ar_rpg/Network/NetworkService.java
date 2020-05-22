@@ -3,6 +3,7 @@ package com.example.superpuper_ar_rpg.Network;
 import android.util.Log;
 
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestBriefDto;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ public class NetworkService  {
 
 
     public void requestQuests(String token, QuestsRequestBody questsRequestBody, Callback callback){
-        Call<ArrayList<MapQuest>> parsedQuests = api.requestQuestsInRange("token="+token, questsRequestBody.getTop(), questsRequestBody.getBottom(), questsRequestBody.getLeft(), questsRequestBody.getRight());
+        Call<ArrayList<MapQuestBriefDto>> parsedQuests = api.requestQuestsInRange("token="+token, questsRequestBody.getTop(), questsRequestBody.getBottom(), questsRequestBody.getLeft(), questsRequestBody.getRight());
         parsedQuests.enqueue(callback);
     }
 }

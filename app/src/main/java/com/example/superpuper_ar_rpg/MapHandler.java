@@ -15,6 +15,7 @@ import com.example.superpuper_ar_rpg.Activities.QuestActivity;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestBriefDto;
 import com.example.superpuper_ar_rpg.Network.NetworkService;
 import com.example.superpuper_ar_rpg.Network.QuestsRequestBody;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -96,7 +97,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
                         Intent goToQuest = new Intent(context, QuestActivity.class);
                         goToQuest.putExtra("title", item.getTitle());
                         goToQuest.putExtra("rating", item.getRating());
-                        goToQuest.putExtra("description", item.getDescription());
                         ((Activity)context).startActivity(goToQuest);
                     }
                 });
@@ -146,18 +146,18 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     public void onCameraIdle(){
         Log.d("TAG", "onCameraIdle");
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
-        ArrayList<MapQuest> parsedQuests1 = new ArrayList<>();
-        NetworkService.getInstance().requestQuests(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MapQuest>>() {
+        ArrayList<MapQuestBriefDto> parsedQuests1 = new ArrayList<>();
+        NetworkService.getInstance().requestQuests(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MapQuestBriefDto>>() {
             @Override
-            public void onResponse(Call<ArrayList<MapQuest>> call, Response<ArrayList<MapQuest>> response) {
+            public void onResponse(Call<ArrayList<MapQuestBriefDto>> call, Response<ArrayList<MapQuestBriefDto>> response) {
                 if(response.isSuccessful()){
                     Log.d("NETWORKInf", "Server returned array with " + response.body().size() + " quests");
                     parsedQuests1.addAll(response.body());
                     ArrayList<Marker> appendedMarkers = new ArrayList<>(clusterManager.getClusterMarkerCollection().getMarkers());
                     clusterManager.clearItems();
-                    for(MapQuest buf: parsedQuests1){
-                        Log.d("TAG", "buf " + buf.getCoordinates());
-                        clusterManager.addItem(new MarkerItem(buf.getLatitude(), buf.getLongitude(), buf.getTitle(), "What?",  buf.getRating(), buf.getText()));
+                    for(MapQuestBriefDto buf: parsedQuests1){
+                        Log.d("TAG", "buf " + buf.getLatitude() + " " + buf.getLongitude());
+                        clusterManager.addItem(new MarkerItem(buf.getLatitude(), buf.getLongitude(), buf.getTitle(), "What?",  buf.getRating()));
                     }
                     clusterManager.cluster();
                 } else {
@@ -166,7 +166,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
             }
             @Override
-            public void onFailure(Call<ArrayList<MapQuest>> call, Throwable t) {
+            public void onFailure(Call<ArrayList<MapQuestBriefDto>> call, Throwable t) {
                 Log.d("NETWORKInf", "Failed to get quests");
             }
         });
