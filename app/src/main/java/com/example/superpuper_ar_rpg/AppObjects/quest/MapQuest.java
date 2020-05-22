@@ -36,6 +36,7 @@ public class MapQuest extends Quest {
         this.rating = briefDto.getRating();
         this.body = detailsDto.getBody();
         this.text = detailsDto.getText();
+        this.units = new Gson().fromJson(detailsDto.getBody(), ArrayList.class);
     }
 
     public double getRating(){
