@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.superpuper_ar_rpg.Activities.QuestActivity;
-import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
 import com.example.superpuper_ar_rpg.Network.NetworkService;
@@ -26,7 +26,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;

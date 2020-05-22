@@ -1,10 +1,8 @@
 package com.example.superpuper_ar_rpg.Network;
 
-import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
-import com.google.android.gms.maps.model.LatLng;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

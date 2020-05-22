@@ -1,21 +1,14 @@
-package com.example.superpuper_ar_rpg.AppObjects;
+package com.example.superpuper_ar_rpg.AppObjects.quest;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public abstract class Quest {
-    @SerializedName("id")
-    @Expose
     protected long id;
-    @SerializedName("title")
-    @Expose
     protected String title;
-    @SerializedName("text")
-    @Expose
     protected String text;
-    @SerializedName("author")
-    @Expose
+    protected String body;
     protected String author;
 
 
@@ -28,4 +21,6 @@ public abstract class Quest {
     public String getAuthor(){
         return(author);
     }
+    public long getId() {return id;}
+    public String getBody() { return body; }
 }

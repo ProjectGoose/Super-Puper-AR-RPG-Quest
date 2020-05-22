@@ -2,12 +2,10 @@ package com.example.superpuper_ar_rpg.Network;
 
 import android.util.Log;
 
-import com.example.superpuper_ar_rpg.AppObjects.MapQuest;
-import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
