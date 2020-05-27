@@ -184,12 +184,12 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     class GetQuestsThread extends Thread{
         @Override
         public void run(){
-            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
-                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
-            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
-            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
-            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
-            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
+//            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
+//                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
+//            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
+//            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
+//            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
+//            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
         }
     }
 
