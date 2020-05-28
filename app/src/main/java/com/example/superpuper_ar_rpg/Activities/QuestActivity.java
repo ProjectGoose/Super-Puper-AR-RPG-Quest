@@ -58,7 +58,7 @@ public class QuestActivity extends AppCompatActivity {
         tv_rating = findViewById(R.id.tv_rating);
         tv_description = findViewById(R.id.tv_description);
         bt_accept = findViewById(R.id.bt_accept);
-        thisLayout = findViewById(R.id.questLayout);
+        thisLayout = findViewById(R.id.layout_quest);
 
         MapQuestBriefDto briefDto = getIntent().getParcelableExtra("BriefDto");
 

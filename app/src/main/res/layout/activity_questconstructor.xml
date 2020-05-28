@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/constructorLayout">
 
     <TextView
         android:id="@+id/tv_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:text="Добавить квест"
-        android:textSize="35sp" />
+        android:textSize="35sp"
+        />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/sp_quests"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_marginTop="20dp"
+        android:layout_height="40dp" />
 
     <Button
         android:id="@+id/bt_addUnit"
@@ -26,5 +30,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Удалить этап" />
+
+    <ScrollView
+        android:id="@+id/sview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/sviewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/bt_send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Отправить" />
 
 </LinearLayout>

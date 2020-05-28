@@ -3,29 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/layout_quest">
+    android:id="@+id/unit_text">
 
     <TextView
-        android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="0."
+        android:textSize="20sp"
+        android:id="@+id/num"
+        />
 
-    <TextView
-        android:id="@+id/tv_rating"
+    <EditText
+        android:id="@+id/tv_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:hint="Введите вопрос"
+        android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/tv_description"
+    <EditText
+        android:id="@+id/tv_correctAnswer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <Button
-        android:id="@+id/bt_accept"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_pickQuest" />
+        android:hint="Введите правильный ответ"
+        android:textSize="20sp"/>
 </LinearLayout>

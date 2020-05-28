@@ -4,7 +4,7 @@ public class TextUnit extends Unit{
     private String correctAnswer;
 
     public TextUnit(String question){
-        super(1, question);
+        super(1,  question);
     }
 
 

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.superpuper_ar_rpg.Activities.QuestActivity;
+import com.example.superpuper_ar_rpg.Activities.QuestConstructorActivity;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
@@ -80,12 +81,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
         this.fusedLocationClient = fusedLocationClient;
 
         questInfoButton = ((Activity)context).findViewById(R.id.bt_questInfo);
-        questInfoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         //Устанавливаем кластеризацию
         clusterManager = new ClusterManager<MarkerItem>(context, map);
@@ -190,7 +185,10 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
         questInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent goToConstructor = new Intent(context, QuestConstructorActivity.class);
+                goToConstructor.putExtra("lat", latLng.latitude);
+                goToConstructor.putExtra("lng", latLng.longitude);
+                ((Activity)context).startActivity(goToConstructor);
             }
         });
     }
