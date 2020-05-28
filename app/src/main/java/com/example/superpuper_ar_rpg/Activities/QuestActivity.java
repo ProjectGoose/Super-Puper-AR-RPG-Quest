@@ -215,6 +215,7 @@ public class QuestActivity extends AppCompatActivity {
         Log.d("TAG-QuestActivityInf", "question " + unit.getQuestion());
         container.addView(tv);
         container.addView(et);
+        container.setPadding(0, 10,0,0);
         questUnitsLayout.addView(container);
         units.add(new GroupOfViewText(((TextUnit)unit).getCorrectAnswer(), tv, et));
     }
@@ -237,6 +238,7 @@ public class QuestActivity extends AppCompatActivity {
         }
         container.addView(tv);
         container.addView(rg);
+        container.setPadding(0, 10,0,0);
         questUnitsLayout.addView(container);
         units.add(new GroupOfViewRadio(((RadioUnit) unit).getCorrectAnswer(), tv, rg));
     }
