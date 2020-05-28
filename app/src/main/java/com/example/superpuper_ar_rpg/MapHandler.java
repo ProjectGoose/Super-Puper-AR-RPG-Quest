@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.superpuper_ar_rpg.Activities.QuestActivity;
+import com.example.superpuper_ar_rpg.Activities.QuestConstructorActivity;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.MarkerItem;
 import com.example.superpuper_ar_rpg.AppObjects.User;
@@ -190,7 +191,10 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
         questInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent goToConstructor = new Intent(context, QuestConstructorActivity.class);
+                goToConstructor.putExtra("lat", latLng.latitude);
+                goToConstructor.putExtra("lng", latLng.longitude);
+                ((Activity)context).startActivity(goToConstructor);
             }
         });
     }
@@ -219,7 +223,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
         locationCallback = setLocationCallback();
         try {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-            //mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, mlocationListener);
         } catch (NullPointerException e) {
             Log.d("TAG1", "SecurityException: " + e.getMessage());
         }
@@ -239,7 +242,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
                         locationUpdateCounter = 0;
                         NetworkService.getInstance().sendLocation(User.getInstance().getToken(), new LatLng(loc.getLatitude(), loc.getLongitude()));
                     }
-                    //Toast.makeText(context, "Location updated " + User.getInstance().getCoordinates().latitude + " " + User.getInstance().getCoordinates().longitude, Toast.LENGTH_SHORT).show();
                     setUserMarker();
                 } else {
                     Log.d("TAG-MapHandlerErr", "received location == null");

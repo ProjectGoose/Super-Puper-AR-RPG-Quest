@@ -75,5 +75,9 @@ public class MapQuest extends Quest {
         result.setText(new Gson().toJson(units, ArrayList.class));
         return result;
     }
+
+    public void addUnit(Unit unit){
+        units.add(unit);
+    }
 }
 

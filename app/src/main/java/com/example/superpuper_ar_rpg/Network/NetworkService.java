@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestBriefDto;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDetailsDto;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDto;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -87,5 +88,10 @@ public class NetworkService  {
     public void requestQuestBody(String token, long id, Callback callback){
         Call<MapQuestDetailsDto> mapQuestCall = api.requestQuestBody("token="+token, id);
         mapQuestCall.enqueue(callback);
+    }
+
+    public void addQuest(String token, MapQuestDto mapQuestDto, Callback callback){
+        Call<String> call = api.addQuest("token="+token, mapQuestDto);
+        call.enqueue(callback);
     }
 }

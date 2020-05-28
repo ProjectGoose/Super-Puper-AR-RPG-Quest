@@ -1,8 +1,8 @@
 package com.example.superpuper_ar_rpg.Network;
 
-import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestBriefDto;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDetailsDto;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDto;
 
 import java.util.ArrayList;
 
@@ -26,15 +26,18 @@ public interface ServerAPI {
     Call<String> loginUserTest(@Field("login") String login, @Field("password") String password);
 
     @POST("/user-controller/location-update")
-    Call<String> sendLocation(@Header("Cookie")String token, @Body SendLocationBody locationBody);
+    Call<String> sendLocation(@Header("Cookie") String token, @Body SendLocationBody locationBody);
 
     @FormUrlEncoded
     @POST("/quest/getAllInRange")
-    Call<ArrayList<MapQuestBriefDto>> requestQuestsInRange(@Header("Cookie")String token, @Field("top")double top,
-                                                           @Field("bottom")double bottom, @Field("left")double left, @Field("right")double right);
+    Call<ArrayList<MapQuestBriefDto>> requestQuestsInRange(@Header("Cookie") String token, @Field("top") double top,
+                                                           @Field("bottom") double bottom, @Field("left") double left, @Field("right") double right);
 
     @FormUrlEncoded
     @POST("/quest/getDeteils")
-    Call<MapQuestDetailsDto> requestQuestBody(@Header("Cookie")String token, @Field("id")long id);
+    Call<MapQuestDetailsDto> requestQuestBody(@Header("Cookie") String token, @Field("id") long id);
+
+    @POST("/quest/create")
+    Call<String> addQuest(@Header("Cookie") String token, @Body MapQuestDto mapQuestDto);
 }
 
