@@ -10,7 +10,7 @@ public class TextUnit extends Unit{
 
     @Override
     public String getQuestion() {
-        return null;
+        return question;
     }
 
     public String getCorrectAnswer() {

@@ -16,7 +16,7 @@ public class RadioUnit extends Unit {
 
     @Override
     public String getQuestion() {
-        return null;
+        return question;
     }
 
     public int getCorrectAnswer() {

@@ -4,7 +4,7 @@ import android.util.Log;
 
 public abstract class Unit {
     private int type;
-    private String question;
+    protected String question;
 
     Unit(int type, String question){
         this.question = question;
