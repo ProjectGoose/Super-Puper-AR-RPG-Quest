@@ -62,8 +62,6 @@ public class QuestActivity extends AppCompatActivity {
 
         MapQuestBriefDto briefDto = getIntent().getParcelableExtra("BriefDto");
 
-
-
         //Делаем запрос на параметры квеста и устанавливаем оставшиеся поля
         NetworkService.getInstance().requestQuestBody(User.getInstance().getToken(), briefDto.getId(), new Callback<MapQuestDetailsDto>() {
             @Override

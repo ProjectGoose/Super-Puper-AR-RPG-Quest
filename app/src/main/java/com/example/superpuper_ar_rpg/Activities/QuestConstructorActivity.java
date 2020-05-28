@@ -12,6 +12,7 @@ import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,12 +20,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.superpuper_ar_rpg.AppObjects.App;
 import com.example.superpuper_ar_rpg.AppObjects.GroupsOfViews.GroupOfView;
 import com.example.superpuper_ar_rpg.AppObjects.GroupsOfViews.GroupOfViewText;
+import com.example.superpuper_ar_rpg.AppObjects.User;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDto;
 import com.example.superpuper_ar_rpg.AppObjects.quest.TextUnit;
 import com.example.superpuper_ar_rpg.AppObjects.quest.Unit;
+import com.example.superpuper_ar_rpg.Network.NetworkService;
 import com.example.superpuper_ar_rpg.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class QuestConstructorActivity extends AppCompatActivity {
@@ -95,7 +105,20 @@ public class QuestConstructorActivity extends AppCompatActivity {
         bt_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MapQuest buf = new MapQuest("Классный квест", "Классное описание",
+                        new LatLng(getIntent().getExtras().getDouble("lat"), getIntent().getExtras().getDouble("lng")), 5);
+                NetworkService.getInstance().addQuest(User.getInstance().getToken(), new MapQuestDto(buf), new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
 
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+
+                    }
+                });
+                Toast.makeText(QuestConstructorActivity.this, "Вы великолепны!", Toast.LENGTH_SHORT).show();
             }
         });
     }
