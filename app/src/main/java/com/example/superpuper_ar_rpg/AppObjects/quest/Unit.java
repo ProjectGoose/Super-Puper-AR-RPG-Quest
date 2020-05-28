@@ -1,11 +1,14 @@
 package com.example.superpuper_ar_rpg.AppObjects.quest;
 
+import android.util.Log;
+
 public abstract class Unit {
     private int type;
     private String question;
 
     Unit(int type, String question){
         this.question = question;
+        Log.d("TAG-Unit", " " + question);
         this.type = type;
     }
 

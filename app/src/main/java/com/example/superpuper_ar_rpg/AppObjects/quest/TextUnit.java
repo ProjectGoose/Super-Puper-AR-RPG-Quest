@@ -3,7 +3,7 @@ package com.example.superpuper_ar_rpg.AppObjects.quest;
 public class TextUnit extends Unit{
     private String correctAnswer;
 
-    TextUnit(String question){
+    public TextUnit(String question){
         super(1, question);
     }
 

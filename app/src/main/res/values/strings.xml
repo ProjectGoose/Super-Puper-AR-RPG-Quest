@@ -19,4 +19,6 @@
     <string name="authWrongPassword">Неверный логин или пароль</string>
     <string name="authFail">Не удалось установить связь с сервером</string>
     <string name="btn_pickQuest">Приступить</string>
+    <string name="btn_rejectQuest">Отказаться</string>
+    <string name="toast_closeToQuest">Вы находитесь слишком далеко!</string>
 </resources>

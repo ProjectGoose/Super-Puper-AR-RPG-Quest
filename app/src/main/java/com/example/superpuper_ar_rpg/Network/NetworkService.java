@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestBriefDto;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDetailsDto;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -46,14 +47,14 @@ public class NetworkService  {
         return instance;
     }
 
-
+    //логин
     //Test, plain text response
     public void loginTest(Callback<String> callback, String login, String password){
         Call<String> stringCall = apiTest.loginUserTest(login, password);
         stringCall.enqueue(callback);
     }
 
-
+    //Отправляем свое мостоположение на сервер
     public void sendLocation(String token, LatLng location){
         Call<String> stringCall = api.sendLocation("token=" + token, new SendLocationBody(location.latitude, location.longitude));
         ArrayList<Boolean> flag = new ArrayList<>();
@@ -77,9 +78,14 @@ public class NetworkService  {
         });
     }
 
-
-    public void requestQuests(String token, QuestsRequestBody questsRequestBody, Callback callback){
+    //запрашиваем квесты для карты
+    public void requestQuestsInRange(String token, QuestsRequestBody questsRequestBody, Callback callback){
         Call<ArrayList<MapQuestBriefDto>> parsedQuests = api.requestQuestsInRange("token="+token, questsRequestBody.getTop(), questsRequestBody.getBottom(), questsRequestBody.getLeft(), questsRequestBody.getRight());
         parsedQuests.enqueue(callback);
+    }
+
+    public void requestQuestBody(String token, long id, Callback callback){
+        Call<MapQuestDetailsDto> mapQuestCall = api.requestQuestBody("token="+token, id);
+        mapQuestCall.enqueue(callback);
     }
 }
