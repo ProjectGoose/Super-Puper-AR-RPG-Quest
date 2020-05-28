@@ -1,5 +1,6 @@
 package com.example.superpuper_ar_rpg.Activities;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,7 +32,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,7 +45,7 @@ public class QuestActivity extends AppCompatActivity {
     private Button bt_pass;
     private boolean isCloseEnough;
     private boolean isAccepted = false;
-    private LinearLayout thisLayout;
+    private LinearLayout thisLayout, questUnitsLayout;
     private ArrayList<GroupOfView> units = new ArrayList<>();
     //private MapQuestBriefDto briefDto;
     MapQuest thisQuest;
@@ -58,7 +58,8 @@ public class QuestActivity extends AppCompatActivity {
         tv_rating = findViewById(R.id.tv_rating);
         tv_description = findViewById(R.id.tv_description);
         bt_accept = findViewById(R.id.bt_accept);
-        thisLayout = findViewById(R.id.questLayout);
+        thisLayout = findViewById(R.id.quest_units_layout);
+        questUnitsLayout = findViewById(R.id.quest_units_layout);
 
         MapQuestBriefDto briefDto = getIntent().getParcelableExtra("BriefDto");
 
@@ -153,12 +154,12 @@ public class QuestActivity extends AppCompatActivity {
                     for(GroupOfView group: units){
                         switch (group.getType()){
                             case 1:
-                                thisLayout.removeView(((GroupOfViewText)group).getQuestion());
-                                thisLayout.removeView(((GroupOfViewText) group).getAnswer());
+                                questUnitsLayout.removeView(((GroupOfViewText)group).getQuestion());
+                                questUnitsLayout.removeView(((GroupOfViewText) group).getAnswer());
                                 break;
                             case 2:
-                                thisLayout.removeView(((GroupOfViewRadio)group).getQuestion());
-                                thisLayout.removeView(((GroupOfViewRadio) group).getRadioGroup());
+                                questUnitsLayout.removeView(((GroupOfViewRadio)group).getQuestion());
+                                questUnitsLayout.removeView(((GroupOfViewRadio) group).getRadioGroup());
                                 break;
                         }
                     }
@@ -202,27 +203,41 @@ public class QuestActivity extends AppCompatActivity {
     }
 
     void setViewText(Unit unit){
+        LinearLayout container = new LinearLayout(QuestActivity.this);
+        container.setBackgroundColor(Color.GRAY);
+        container.setOrientation(LinearLayout.VERTICAL);
+
         TextView tv = new TextView(QuestActivity.this);
         EditText et = new EditText(QuestActivity.this);
         tv.setText(unit.getQuestion());
+        tv.setTextColor(Color.WHITE);
+        et.setTextColor(Color.LTGRAY);
         Log.d("TAG-QuestActivityInf", "question " + unit.getQuestion());
-        thisLayout.addView(tv);
-        thisLayout.addView(et);
+        container.addView(tv);
+        container.addView(et);
+        questUnitsLayout.addView(container);
         units.add(new GroupOfViewText(((TextUnit)unit).getCorrectAnswer(), tv, et));
     }
 
     void setViewRadio(Unit unit){
+        LinearLayout container = new LinearLayout(QuestActivity.this);
+        container.setBackgroundColor(Color.GRAY);
+        container.setOrientation(LinearLayout.VERTICAL);
+
         TextView tv = new TextView(QuestActivity.this);
         tv.setText(unit.getQuestion());
+        tv.setTextColor(Color.WHITE);
         RadioGroup rg = new RadioGroup(QuestActivity.this);
         for(String ans: ((RadioUnit)unit).getAnswers()){
             RadioButton rb = new RadioButton(QuestActivity.this);
             rb.setText(ans);
+            rb.setTextColor(Color.LTGRAY);
             Log.d("TAG-QuestActivityInf", "question " + unit.getQuestion());
             rg.addView(rb);
         }
-        thisLayout.addView(tv);
-        thisLayout.addView(rg);
+        container.addView(tv);
+        container.addView(rg);
+        questUnitsLayout.addView(container);
         units.add(new GroupOfViewRadio(((RadioUnit) unit).getCorrectAnswer(), tv, rg));
     }
 
