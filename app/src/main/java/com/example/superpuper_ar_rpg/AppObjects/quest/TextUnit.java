@@ -13,6 +13,15 @@ public class TextUnit extends Unit{
         return question;
     }
 
+    public TextUnit(String question, String correctAnswer) {
+        super(1, question);
+        this.correctAnswer = correctAnswer;
+    }
+
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
+    }
+
     public String getCorrectAnswer() {
         return correctAnswer;
     }

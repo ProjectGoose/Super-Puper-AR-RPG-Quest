@@ -8,15 +8,25 @@ public class RadioUnit extends Unit {
 
     public RadioUnit(String question){
         super(2, question);
-        answers.add(new String("one"));
-        answers.add(new String("two"));
-        answers.add(new String("three"));
-        answers.add(new String("four"));
+    }
+
+    public void setAnswers(ArrayList<String> answers) {
+        this.answers = answers;
+    }
+
+    public RadioUnit(String question, int correctAnswer, ArrayList<String> answers) {
+        super(2, question);
+        this.correctAnswer = correctAnswer;
+        this.answers = answers;
     }
 
     @Override
     public String getQuestion() {
         return question;
+    }
+
+    public void setCorrectAnswer(int correctAnswer) {
+        this.correctAnswer = correctAnswer;
     }
 
     public int getCorrectAnswer() {

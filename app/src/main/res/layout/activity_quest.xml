@@ -10,19 +10,27 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:fontFamily="monospace"
+        android:text="TextView"
+        android:textColor="#0D0E12"
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/tv_rating"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:fontFamily="monospace"
+        android:text="TextView"
+        android:textColor="#AE6969"
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/tv_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:fontFamily="monospace"
+        android:text="TextView"
+        android:textSize="24sp" />
 
     <Button
         android:id="@+id/bt_accept"
