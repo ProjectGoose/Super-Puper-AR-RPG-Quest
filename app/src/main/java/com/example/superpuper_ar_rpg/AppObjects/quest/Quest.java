@@ -24,3 +24,4 @@ public abstract class Quest {
     public long getId() {return id;}
     public String getBody() { return body; }
 }
+

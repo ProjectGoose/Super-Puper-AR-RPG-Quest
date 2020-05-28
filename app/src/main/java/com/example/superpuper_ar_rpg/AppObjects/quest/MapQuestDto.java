@@ -1,6 +1,10 @@
 package com.example.superpuper_ar_rpg.AppObjects.quest;
 
-class MapQuestDto {
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+
+public class MapQuestDto {
     private long id;
     private String title;
     private String text;
@@ -10,14 +14,14 @@ class MapQuestDto {
     private double longitude;
     private double rating;
 
-    MapQuestDto(MapQuest mapQuest){
+    public MapQuestDto(MapQuest mapQuest){
         this.id = mapQuest.getId();
         this.title = mapQuest.getTitle();
         this.author = mapQuest.getAuthor();
         this.latitude = mapQuest.getCoordinates().latitude;
         this.longitude = mapQuest.getCoordinates().longitude;
         this.rating = mapQuest.getRating();
-        this.body = mapQuest.getBody();
+        this.body = new Gson().toJson(mapQuest.getUnits(), ArrayList.class);
         this.text = mapQuest.getText();
     }
 

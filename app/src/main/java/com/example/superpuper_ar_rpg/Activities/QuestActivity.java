@@ -65,25 +65,25 @@ public class QuestActivity extends AppCompatActivity {
 
 
         //Делаем запрос на параметры квеста и устанавливаем оставшиеся поля
-        NetworkService.getInstance().requestQuestBody(User.getInstance().getToken(), getIntent().getExtras().getLong("questID"), new Callback<MapQuestDetailsDto>() {
+        NetworkService.getInstance().requestQuestBody(User.getInstance().getToken(), briefDto.getId(), new Callback<MapQuestDetailsDto>() {
             @Override
             public void onResponse(Call<MapQuestDetailsDto> call, Response<MapQuestDetailsDto> response) {
                 if(response.isSuccessful()) {
-                    Log.d("TAG-QuestActivity-Inf", " " + response.body());
-                    //thisQuest = new MapQuest(briefDto, response.body());
+                    Log.d("TAG-QuestActivity-Inf", " d " + response.body());
+                    thisQuest = new MapQuest(briefDto, response.body());
                     //временно
-                    {
+                    /*{
                         thisQuest = new MapQuest("TITLE", "Test text for testers who test text quests", new LatLng(briefDto.getLatitude(), briefDto.getLongitude()), 10);
                         //почему то не добавляется
                         thisQuest.getUnits().add(new TextUnit("Скажите бармену в баре Голубая устрица на Литейной 38, что вы от Калбека. Впишите ответ"));
                         thisQuest.getUnits().add(new RadioUnit("Количество ступенек у памятника name: "));
                         Log.d("TAG-QuestActivityInf", " QUESTION " + thisQuest.getUnits().get(0).getQuestion());
-                    }
+                    }*/
 
-                    tv_title.setText(thisQuest.getText());
-                    tv_rating.setText(String.format("%f", thisQuest.getRating()));
+                    tv_title.setText(thisQuest.getTitle());
+                    tv_rating.setText(String.format("%.2f", thisQuest.getRating()));
+                    tv_description.setText(thisQuest.getText());
                 } else {
-
                     Log.d("TAG-QuestActivityErr", "Smth goes wrong");
                 }
             }
@@ -106,7 +106,9 @@ public class QuestActivity extends AppCompatActivity {
                     if (true /*bounds.contains(User.getInstance().getCoordinates())*/) {
                         isAccepted = true;
                         bt_accept.setText(R.string.btn_rejectQuest);
-                        for (Unit unit : thisQuest.getUnits()) {
+                        ArrayList<Unit> unitsQuest = thisQuest.getUnits();
+                        for (int i = 0; i < unitsQuest.size(); i++) {
+                            Unit unit = unitsQuest.get(i);
                             //интовый type нужно бы заменить на указатель на класс
                             switch (unit.getType()) {
                                 case 1:
