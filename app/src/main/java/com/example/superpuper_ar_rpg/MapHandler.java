@@ -46,7 +46,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MapHandler implements GoogleMap.OnCameraIdleListener {
+public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnMapLongClickListener {
 
     private Context context;
     private FusedLocationProviderClient fusedLocationClient;
@@ -56,6 +56,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     private int locationUpdateCounter = 0;
     private LocationCallback locationCallback;
     private Button questInfoButton;
+    private int ButtonState;
 
     //debug
     public static boolean isMocking = false;
@@ -79,11 +80,18 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         this.fusedLocationClient = fusedLocationClient;
 
         questInfoButton = ((Activity)context).findViewById(R.id.bt_questInfo);
+        questInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         //Устанавливаем кластеризацию
         clusterManager = new ClusterManager<MarkerItem>(context, map);
         map.setOnCameraIdleListener(this);
         map.setOnMarkerClickListener(clusterManager);
+        map.setOnMapLongClickListener(this);
 
         clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerItem>() {
             //При нажатии на маркер:
@@ -116,7 +124,6 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     public void start() {
         startLocationUpdates();
-        getQuests();
     }
 
     public void stop() {
@@ -176,25 +183,17 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
 
     }
 
-    public void getQuests(){
-        Log.d("TAG", "getQuests");
-        GetQuestsThread gqt = new GetQuestsThread();
-        gqt.start();
-    }
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        questInfoButton.setText("Добавить квест");
+        questInfoButton.setVisibility(View.VISIBLE);
+        questInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-    //будет парсить маркеры
-    class GetQuestsThread extends Thread{
-        @Override
-        public void run(){
-//            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
-//                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
-//            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
-//            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
-//            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
-//            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
-        }
+            }
+        });
     }
-
 
     private void startLocationUpdates(){
         //Инициализируем User.coordinates последними координатами

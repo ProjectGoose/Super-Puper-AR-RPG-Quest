@@ -47,6 +47,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.QuestActivity"/>
+        <activity android:name=".Activities.QuestConstructorActivity"/>
     </application>
 
 </manifest>
