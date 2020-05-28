@@ -1,6 +1,9 @@
 package com.example.superpuper_ar_rpg.AppObjects.quest;
 
-public class MapQuestBriefDto {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class MapQuestBriefDto implements Parcelable {
     private long id;
     private String title;
     private double latitude;
@@ -34,4 +37,37 @@ public class MapQuestBriefDto {
     public double getRating() {
         return rating;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeLong(id);
+        parcel.writeString(title);
+        parcel.writeDouble(latitude);
+        parcel.writeDouble(longitude);
+        parcel.writeDouble(rating);
+    }
+
+    public static final Parcelable.Creator<MapQuestBriefDto> CREATOR = new Parcelable.Creator<MapQuestBriefDto>() {
+
+        @Override
+        public MapQuestBriefDto createFromParcel(Parcel source) {
+            long id = source.readLong();
+            String title = source.readString();
+            double latitude = source.readDouble();
+            double longitude = source.readDouble();
+            double rating = source.readDouble();
+
+            return new MapQuestBriefDto(id, title, latitude, longitude, rating);
+        }
+
+        @Override
+        public MapQuestBriefDto[] newArray(int size) {
+            return new MapQuestBriefDto[size];
+        }
+    };
 }

@@ -2,7 +2,11 @@ package com.example.superpuper_ar_rpg.AppObjects;
 
 import android.graphics.Bitmap;
 
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+
 //singleton
 public class User {
 
@@ -13,6 +17,7 @@ public class User {
     private int level;
     private int age;
     private Race race;
+    private ArrayList<MapQuest> activeQuests = new ArrayList<>();
 
     enum Race{
         ORK("Орк"), ELF("Эльф"), HUMAN ("Человек"), HOBBIT("Хоббит");
@@ -60,7 +65,9 @@ public class User {
         race = Race.ORK;
     }
 
-
+    public ArrayList<MapQuest> getActiveQuests() {
+        return activeQuests;
+    }
     public LatLng getCoordinates(){
         return(coordinates);
     }
@@ -79,4 +86,6 @@ public class User {
     public void setCoordinates(LatLng coordinates) {
         this.coordinates = coordinates;
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.example.superpuper_ar_rpg.Network;
 
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuest;
 import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestBriefDto;
+import com.example.superpuper_ar_rpg.AppObjects.quest.MapQuestDetailsDto;
 
 import java.util.ArrayList;
 
@@ -32,5 +33,8 @@ public interface ServerAPI {
     Call<ArrayList<MapQuestBriefDto>> requestQuestsInRange(@Header("Cookie")String token, @Field("top")double top,
                                                            @Field("bottom")double bottom, @Field("left")double left, @Field("right")double right);
 
+    @FormUrlEncoded
+    @POST("/quest/getDeteils")
+    Call<MapQuestDetailsDto> requestQuestBody(@Header("Cookie")String token, @Field("id")long id);
 }
 

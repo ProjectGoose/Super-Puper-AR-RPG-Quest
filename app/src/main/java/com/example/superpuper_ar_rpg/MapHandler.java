@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -95,6 +96,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
                     @Override
                     public void onClick(View v) {
                         Intent goToQuest = new Intent(context, QuestActivity.class);
+                        goToQuest.putExtra("BriefDto",  new MapQuestBriefDto(item.getId(), item.getTitle(), item.getLatitude(), item.getLongitude(), item.getRating()));
                         goToQuest.putExtra("title", item.getTitle());
                         goToQuest.putExtra("rating", item.getRating());
                         ((Activity)context).startActivity(goToQuest);
@@ -147,7 +149,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
         Log.d("TAG", "onCameraIdle");
         VisibleRegion visReg = map.getProjection().getVisibleRegion();
         ArrayList<MapQuestBriefDto> parsedQuests1 = new ArrayList<>();
-        NetworkService.getInstance().requestQuests(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MapQuestBriefDto>>() {
+        NetworkService.getInstance().requestQuestsInRange(User.getInstance().getToken(), new QuestsRequestBody(visReg), new Callback<ArrayList<MapQuestBriefDto>>() {
             @Override
             public void onResponse(Call<ArrayList<MapQuestBriefDto>> call, Response<ArrayList<MapQuestBriefDto>> response) {
                 if(response.isSuccessful()){
@@ -157,7 +159,7 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
                     clusterManager.clearItems();
                     for(MapQuestBriefDto buf: parsedQuests1){
                         Log.d("TAG", "buf " + buf.getLatitude() + " " + buf.getLongitude());
-                        clusterManager.addItem(new MarkerItem(buf.getLatitude(), buf.getLongitude(), buf.getTitle(), "What?",  buf.getRating()));
+                        clusterManager.addItem(new MarkerItem(buf.getLatitude(), buf.getLongitude(), buf.getTitle(), buf.getRating(),  buf.getId()));
                     }
                     clusterManager.cluster();
                 } else {
@@ -184,12 +186,12 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener {
     class GetQuestsThread extends Thread{
         @Override
         public void run(){
-            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
-                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
-            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
-            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
-            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
-            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
+//            parsedQuests.add(new MapQuest("Проникнуть в рот мирэа",
+//                    "Возможный лут: кожаные костюмы, Карпов.\nОсобо опасно! ", new LatLng(55.669696, 37.481083), 10));
+//            parsedQuests.add(new MapQuest("Взорвать дом разрабу", "text", new LatLng(55.671313, 37.285355), 2));
+//            parsedQuests.add(new MapQuest("Общага ВШЭ", "text", new LatLng(55.667187, 37.282811), 8));
+//            parsedQuests.add(new MapQuest("СОШ №1", "text", new LatLng(55.668836, 37.286733), 0));
+//            parsedQuests.add(new MapQuest("квест", "text", new LatLng(55.664982, 37.283637), 6));
         }
     }
 

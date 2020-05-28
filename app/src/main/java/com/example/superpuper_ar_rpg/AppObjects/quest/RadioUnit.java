@@ -6,7 +6,7 @@ public class RadioUnit extends Unit {
     private int correctAnswer;
     private ArrayList<String> answers = new ArrayList<>();
 
-    RadioUnit(String question){
+    public RadioUnit(String question){
         super(2, question);
         answers.add(new String("one"));
         answers.add(new String("two"));
