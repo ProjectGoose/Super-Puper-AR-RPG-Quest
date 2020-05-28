@@ -81,10 +81,9 @@ public class QuestActivity extends AppCompatActivity {
                     }*/
 
                     tv_title.setText(thisQuest.getTitle());
-                    tv_rating.setText(String.format("%.1f", thisQuest.getRating()));
+                    tv_rating.setText(String.format("%.2f", thisQuest.getRating()));
                     tv_description.setText(thisQuest.getText());
                 } else {
-
                     Log.d("TAG-QuestActivityErr", "Smth goes wrong");
                 }
             }
@@ -98,7 +97,6 @@ public class QuestActivity extends AppCompatActivity {
         //устанавливаем первоначальную надпись на кнопке
         setButtonState();
 
-        ArrayList<Unit> unitsQuest = thisQuest.getUnits();
         bt_accept.setOnClickListener(new View.OnClickListener() {
             //Возможно, нужно создать отдельный класс Application, храянящий все настраиваемые параметры, типа радиус доступности квеста
             @Override
@@ -108,15 +106,16 @@ public class QuestActivity extends AppCompatActivity {
                     if (true /*bounds.contains(User.getInstance().getCoordinates())*/) {
                         isAccepted = true;
                         bt_accept.setText(R.string.btn_rejectQuest);
+                        ArrayList<Unit> unitsQuest = thisQuest.getUnits();
                         for (int i = 0; i < unitsQuest.size(); i++) {
                             Unit unit = unitsQuest.get(i);
                             //интовый type нужно бы заменить на указатель на класс
                             switch (unit.getType()) {
                                 case 1:
-                                    setViewText((TextUnit) unit);
+                                    setViewText(unit);
                                     break;
                                 case 2:
-                                    setViewRadio((RadioUnit) unit);
+                                    setViewRadio(unit);
                                     break;
                             }
                         }
@@ -202,18 +201,17 @@ public class QuestActivity extends AppCompatActivity {
         }
     }
 
-    void setViewText(TextUnit unit){
+    void setViewText(Unit unit){
         TextView tv = new TextView(QuestActivity.this);
         EditText et = new EditText(QuestActivity.this);
-        String question = unit.getQuestion();
-        tv.setText(question);
+        tv.setText(unit.getQuestion());
         Log.d("TAG-QuestActivityInf", "question " + unit.getQuestion());
         thisLayout.addView(tv);
         thisLayout.addView(et);
         units.add(new GroupOfViewText(((TextUnit)unit).getCorrectAnswer(), tv, et));
     }
 
-    void setViewRadio(RadioUnit unit){
+    void setViewRadio(Unit unit){
         TextView tv = new TextView(QuestActivity.this);
         tv.setText(unit.getQuestion());
         RadioGroup rg = new RadioGroup(QuestActivity.this);
