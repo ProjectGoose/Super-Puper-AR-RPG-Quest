@@ -2,6 +2,9 @@ package com.example.superpuper_ar_rpg.AppObjects.quest;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 
@@ -25,7 +28,11 @@ public class MapQuest extends Quest {
         this.author = dto.getAuthor();
         this.id = dto.getId();
         this.text = dto.getText();
-        this.units = new Gson().fromJson(dto.getBody(), ArrayList.class);
+        TypeToken<ArrayList<Unit>> typeToken = new TypeToken<ArrayList<Unit>>() {};
+        this.units = new GsonBuilder()
+                .registerTypeAdapter(typeToken.getType(), new UnitArrayDeserializer())
+                .create()
+                .fromJson(dto.getBody(), typeToken.getType());
     }
 
     public MapQuest(MapQuestBriefDto briefDto, MapQuestDetailsDto detailsDto){
@@ -36,7 +43,11 @@ public class MapQuest extends Quest {
         this.rating = briefDto.getRating();
         this.body = detailsDto.getBody();
         this.text = detailsDto.getText();
-        this.units = new Gson().fromJson(detailsDto.getBody(), ArrayList.class);
+        TypeToken<ArrayList<Unit>> typeToken = new TypeToken<ArrayList<Unit>>() {};
+        this.units = new GsonBuilder()
+                .registerTypeAdapter(typeToken.getType(), new UnitArrayDeserializer())
+                .create()
+                .fromJson(detailsDto.getBody(), typeToken.getType());
     }
 
     public double getRating(){
