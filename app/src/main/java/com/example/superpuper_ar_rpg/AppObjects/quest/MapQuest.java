@@ -14,11 +14,13 @@ public class MapQuest extends Quest {
 
     ArrayList<Unit> units = new ArrayList<>();
     //Изображение, дата добавления, ссылки, автор...
-    public MapQuest(String title, String txt, LatLng coord, int rating){
+    public MapQuest(String title, String txt, LatLng coord, int rating, String author){
         this.title = title;
         this.coordinates = coord;
         this.text = txt;
         this.rating = rating;
+        this.author = author;
+        this.id = 1;
     }
 
     public MapQuest(MapQuestDto dto){

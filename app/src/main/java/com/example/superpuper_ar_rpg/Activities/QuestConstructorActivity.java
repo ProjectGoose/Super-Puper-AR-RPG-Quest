@@ -55,7 +55,7 @@ public class QuestConstructorActivity extends AppCompatActivity {
     private Button bt_add, bt_remove, bt_send;
     private View unit;
     LinearLayout scrollViewContainer;
-    ArrayList<Pair> units = new ArrayList<>();
+    ArrayList<Pair> units = new ArrayList<>(); //лист для хранения пар: тип - ссылка на View
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,13 +108,14 @@ public class QuestConstructorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 MapQuest buf = new MapQuest("Классный квест", "Классное описание",
-                        new LatLng(getIntent().getExtras().getDouble("lat"), getIntent().getExtras().getDouble("lng")), 5);
+                        new LatLng(getIntent().getExtras().getDouble("lat"), getIntent().getExtras().getDouble("lng")), 5, User.getInstance().getNickname());
                 for(Pair pair: units){
                     switch (pair.value) {
                         case 1: {
                             TextView question = pair.view.findViewById(R.id.tv_question);
                             TextView correctAns = pair.view.findViewById(R.id.tv_correctAnswer);
-                            buf.addUnit(new TextUnit(((TextView)pair.view.findViewById(R.id.tv_question)).getText().toString(), ((TextView)pair.view.findViewById(R.id.tv_correctAnswer)).getText().toString()));
+                            buf.addUnit(new TextUnit(((TextView)pair.view.findViewById(R.id.tv_question)).getText().toString(),
+                                    ((TextView)pair.view.findViewById(R.id.tv_correctAnswer)).getText().toString()));
                         }
                         break;
                         case 2: {

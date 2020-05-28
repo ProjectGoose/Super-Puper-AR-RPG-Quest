@@ -77,11 +77,6 @@
             android:minWidth="300dp"
             android:text="@string/back" />
 
-        <Switch
-            android:id="@+id/switch_mocker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mock location?" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

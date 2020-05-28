@@ -72,15 +72,6 @@ public class QuestActivity extends AppCompatActivity {
                 if(response.isSuccessful()) {
                     Log.d("TAG-QuestActivity-Inf", " d " + response.body());
                     thisQuest = new MapQuest(briefDto, response.body());
-                    //временно
-                    /*{
-                        thisQuest = new MapQuest("TITLE", "Test text for testers who test text quests", new LatLng(briefDto.getLatitude(), briefDto.getLongitude()), 10);
-                        //почему то не добавляется
-                        thisQuest.getUnits().add(new TextUnit("Скажите бармену в баре Голубая устрица на Литейной 38, что вы от Калбека. Впишите ответ"));
-                        thisQuest.getUnits().add(new RadioUnit("Количество ступенек у памятника name: "));
-                        Log.d("TAG-QuestActivityInf", " QUESTION " + thisQuest.getUnits().get(0).getQuestion());
-                    }*/
-
                     tv_title.setText(thisQuest.getTitle());
                     tv_rating.setText(String.format("%.2f", thisQuest.getRating()));
                     tv_description.setText(thisQuest.getText());

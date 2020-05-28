@@ -39,5 +39,9 @@ public interface ServerAPI {
 
     @POST("/quest/create")
     Call<String> addQuest(@Header("Cookie") String token, @Body MapQuestDto mapQuestDto);
+
+    @FormUrlEncoded
+    @POST("/user-controller/register")
+    Call<String> register (@Field("login") String login, @Field("password") String password);
 }
 

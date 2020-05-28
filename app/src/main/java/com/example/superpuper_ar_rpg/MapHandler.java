@@ -207,10 +207,10 @@ public class MapHandler implements GoogleMap.OnCameraIdleListener, GoogleMap.OnM
                 if(location != null){
                     User.getInstance().setCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
                     Log.d("TAG-MapHandlerInf", "LastLocation set");
-                    Toast.makeText(context, "LocationSet, " + User.getInstance().getCoordinates(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "LocationSet, " + User.getInstance().getCoordinates(), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d("TAG-MapHandlerErr", "LastLocation can not be set");
-                    Toast.makeText(context, "Location is not set", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Location is not set", Toast.LENGTH_SHORT).show();
                 }
             }
         });

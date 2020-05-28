@@ -94,4 +94,9 @@ public class NetworkService  {
         Call<String> call = api.addQuest("token="+token, mapQuestDto);
         call.enqueue(callback);
     }
+
+    public void register(String login, String password, Callback callback){
+        Call<String> call = api.register(login, password);
+        call.enqueue(callback);
+    }
 }
