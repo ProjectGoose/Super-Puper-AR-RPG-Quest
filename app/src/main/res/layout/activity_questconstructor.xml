@@ -23,13 +23,15 @@
         android:id="@+id/bt_addUnit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Добавить этап" />
+        android:text="Добавить этап"
+        android:background="@drawable/round_button2"/>
 
     <Button
         android:id="@+id/bt_removeUnit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Удалить этап" />
+        android:text="Удалить этап"
+        android:background="@drawable/round_button2"/>
 
     <ScrollView
         android:id="@+id/sview"
@@ -49,6 +51,7 @@
         android:id="@+id/bt_send"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Отправить" />
+        android:text="Отправить"
+        android:background="@drawable/round_button2"/>
 
 </LinearLayout>
